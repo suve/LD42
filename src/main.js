@@ -85,7 +85,7 @@ function printText(x, y, text, size, colour) {
 
 function drawFrame() {
 	fillRect(0, 0, null, null, 'black');
-	ctx.drawImage(playerGfx, 8, 0, 8, 8, Math.floor(player.x), Math.floor(player.y), 8, 8);
+	ctx.drawImage(playerGfx, player.frame*8, 0, 8, 8, Math.floor(player.x), Math.floor(player.y), 8, 8);
 	
 	let fps = countFPS();
 	printText(0, 0, fps+'FPS', 12, 'white');
@@ -140,6 +140,12 @@ function gameLogic() {
 		player.x += PLAYER_SPEED * CYCLE_SECONDS;
 		if(player.x >= canvas.width) player.x = canvas.width-1;
 	}
+	
+	let anyKey = keystate[ARROW_LEFT] || keystate[ARROW_RIGHT];
+	if(anyKey)
+		player.animate(CYCLE_TICKS);
+	else
+		player.stopAnimation();
 }
 
 function resize_canvas() {
@@ -166,10 +172,7 @@ function ld42_init() {
 	canvas = document.getElementsByTagName('canvas')[0];
 	ctx = canvas.getContext('2d', { alpha: false });
 	
-	player = {
-		'x': canvas.width / 2,
-		'y': canvas.height / 2
-	};
+	player = new Player(canvas.width / 2, canvas.height / 2);
 	playerGfx = Assets.addGfx("../gfx/hero-8px.png");
 	
 	let loaded = false;
