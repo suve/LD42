@@ -99,7 +99,7 @@ function ld42_init() {
 	let oldTicks = getTicks();
 	let main_loop = function() {
 		let ticks = getTicks() - oldTicks;
-		oldTicks += ticks;
+		oldTicks += ticks - (ticks % CYCLE_TICKS);
 		
 		drawFrame();
 		
