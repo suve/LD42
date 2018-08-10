@@ -170,7 +170,7 @@ function ld42_init() {
 		'x': canvas.width / 2,
 		'y': canvas.height / 2
 	};
-	playerGfx = Assets.addGfx('../gfx/hero-8px.png');
+	playerGfx = Assets.addGfx("../gfx/hero-8px.png");
 	
 	let loaded = false;
 	let oldTicks = getTicks();
