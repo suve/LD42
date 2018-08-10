@@ -16,6 +16,11 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Game config (yeah, global consts, fight me)
+const CYCLES_PER_SECOND = 50;
+const CYCLE_SECONDS = 1 / CYCLES_PER_SECOND;
+const CYCLE_TICKS = Math.floor(1000 / CYCLES_PER_SECOND);
+
 // Global vars, fuck yeah
 var appstart;
 var canvas, ctx;
@@ -23,6 +28,23 @@ var canvas, ctx;
 function getTicks() {
 	var d = new Date();
 	return d.getTime() - appstart;
+}
+
+function fillRect(x,y,w,h,col) {
+	if(w === null) w = canvas.width;
+	if(h === null) h = canvas.height;
+
+	if(col !== null) ctx.fillStyle = col;
+	ctx.fillRect(Math.floor(x), Math.floor(y), Math.floor(w), Math.floor(h));
+}
+
+function drawFrame() {
+	fillRect(0, 0, null, null, 'black');
+	
+	ctx.font = '48px serif';
+	ctx.fillStyle = 'white';
+	ctx.textBaseline = 'top';
+	ctx.fillText('Hello world', 36, 20);
 }
 
 function resize_canvas() {
@@ -49,6 +71,18 @@ function ld42_init() {
 	canvas = document.getElementsByTagName('canvas')[0];
 	ctx = canvas.getContext('2d', { alpha: false });
 	
+	let oldTicks = getTicks();
+	let main_loop = function() {
+		let ticks = getTicks() - oldTicks;
+		oldTicks += ticks;
+		
+		drawFrame();
+		
+		window.setTimeout(main_loop, CYCLE_TICKS - (ticks % CYCLE_TICKS));
+	};
+	
 	resize_canvas();
 	window.onresize = resize_canvas;
+	
+	main_loop();
 }
