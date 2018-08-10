@@ -15,7 +15,7 @@
  * along with this program (LICENCE.txt). 
  * If not, see <http://www.gnu.org/licenses/>.
  */
-function __assets {
+function __assets() {
 	this.__list = [];
 	
 	this.addGfx = function(path) {
@@ -29,7 +29,7 @@ function __assets {
 		return img;
 	};
 	
-	this.isFinished() = function() {
+	this.isFinished = function() {
 		var count = this.__list.length;
 		for(let c = 0; c < 0; ++c) {
 			if(!this.__list[c].complete) return false;
@@ -50,6 +50,8 @@ function __assets {
 				'ready': it.complete
 			});
 		}
+		
+		return result;
 	};
 }
 

@@ -73,17 +73,33 @@ function fillRect(x,y,w,h,col) {
 	ctx.fillRect(Math.floor(x), Math.floor(y), Math.floor(w), Math.floor(h));
 }
 
+function printText(x, y, text, size, colour) {
+	if(size !== null) ctx.font = size+'px serif';
+	if(colour !== null) ctx.fillStyle = colour;
+	
+	ctx.textBaseline = 'top';
+	ctx.fillText(text, x, y);
+}
+
 function drawFrame() {
 	fillRect(0, 0, null, null, 'black');
 	
 	fillRect(player.x-1, player.y-2, 3, 5, 'lime');
 	
-	ctx.font = '48px serif';
-	ctx.fillStyle = 'white';
-	ctx.textBaseline = 'top';
+	let fps = countFPS();
+	printText(0, 0, fps+'FPS', 12, 'white');
+}
+
+function drawFrame_loading() {
+	let files = Assets.getList();
+	let count = files.length;
+	for(let idx = 0; idx < count; ++idx) {
+		let f = files[idx];
+		printText(32, 16 + 12*idx, f.path, 10, f.ready ? 'lime' : 'red');
+	}
 	
 	let fps = countFPS();
-	ctx.fillText(fps + 'FPS', 36, 20);
+	printText(0, 0, fps+'FPS', 12, 'white');
 }
 
 function keycode(ev) {
@@ -154,14 +170,20 @@ function ld42_init() {
 		'y': canvas.height / 2
 	};
 	
+	let loaded = false;
 	let oldTicks = getTicks();
 	let main_loop = function() {
 		let ticks = getTicks() - oldTicks;
 		let cycles = Math.floor(ticks / CYCLE_TICKS);
 		oldTicks += cycles * CYCLE_TICKS;
 		
-		while(cycles --> 0) gameLogic();
-		drawFrame();
+		if(loaded) {
+			while(cycles --> 0) gameLogic();
+			drawFrame();
+		} else {
+			drawFrame_loading();
+			loaded = Assets.isFinished();
+		}
 		
 		window.setTimeout(main_loop, CYCLE_TICKS - (ticks % CYCLE_TICKS));
 	};
