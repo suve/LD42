@@ -1,0 +1,6 @@
+build/
+var/
+
+*.min.*
+*.bak
+*.geany
