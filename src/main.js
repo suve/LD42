@@ -38,6 +38,8 @@ var canvas, ctx;
 var keystate = [];
 var player;
 
+var playerGfx;
+
 function getTicks() {
 	var d = new Date();
 	return d.getTime() - appstart;
@@ -83,8 +85,7 @@ function printText(x, y, text, size, colour) {
 
 function drawFrame() {
 	fillRect(0, 0, null, null, 'black');
-	
-	fillRect(player.x-1, player.y-2, 3, 5, 'lime');
+	ctx.drawImage(playerGfx, 8, 0, 8, 8, Math.floor(player.x), Math.floor(player.y), 8, 8);
 	
 	let fps = countFPS();
 	printText(0, 0, fps+'FPS', 12, 'white');
@@ -169,6 +170,7 @@ function ld42_init() {
 		'x': canvas.width / 2,
 		'y': canvas.height / 2
 	};
+	playerGfx = Assets.addGfx('../gfx/hero-8px.png');
 	
 	let loaded = false;
 	let oldTicks = getTicks();
