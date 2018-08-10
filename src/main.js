@@ -17,7 +17,13 @@
  */
 
 // Global vars, fuck yeah
+var appstart;
 var canvas, ctx;
+
+function getTicks() {
+	var d = new Date();
+	return d.getTime() - appstart;
+}
 
 function resize_canvas() {
 	const aspect_ratio = 1.6;
@@ -38,6 +44,8 @@ function resize_canvas() {
 }
 
 function ld42_init() {
+	appstart = (new Date()).getTime();
+	
 	canvas = document.getElementsByTagName('canvas')[0];
 	ctx = canvas.getContext('2d', { alpha: false });
 	
