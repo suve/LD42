@@ -18,13 +18,25 @@
 
 // Game config (yeah, global consts, fight me)
 const TICKS_PER_SECOND = 1000;
+
 const CYCLES_PER_SECOND = 50;
 const CYCLE_SECONDS = 1 / CYCLES_PER_SECOND;
 const CYCLE_TICKS = Math.floor(TICKS_PER_SECOND / CYCLES_PER_SECOND);
 
+const PLAYER_SPEED = 120;
+
+
+// Ugh
+const ARROW_LEFT = 37;
+const ARROW_UP = 38;
+const ARROW_RIGHT = 39;
+const ARROW_DOWN = 40;
+
 // Global vars, fuck yeah
 var appstart;
 var canvas, ctx;
+var keystate = [];
+var player;
 
 function getTicks() {
 	var d = new Date();
@@ -64,12 +76,53 @@ function fillRect(x,y,w,h,col) {
 function drawFrame() {
 	fillRect(0, 0, null, null, 'black');
 	
+	fillRect(player.x-1, player.y-2, 3, 5, 'lime');
+	
 	ctx.font = '48px serif';
 	ctx.fillStyle = 'white';
 	ctx.textBaseline = 'top';
 	
 	let fps = countFPS();
 	ctx.fillText(fps + 'FPS', 36, 20);
+}
+
+function keycode(ev) {
+	let k = ev.keyCode;
+	
+	// Do not preventDefault on F-keys (interferes with refreshing and opening the dev tools)
+	if(k < 112 || k > 123) ev.preventDefault();
+	
+	return k;
+}
+
+function handleKeyDown(k) {
+	k = keycode(k);
+	keystate[k] = true;
+}
+
+function handleKeyUp(k) {
+	k = keycode(k);
+	keystate[k] = false;
+}
+
+function gameLogic() {
+	if(keystate[ARROW_UP]) {
+		player.y -= PLAYER_SPEED * CYCLE_SECONDS;
+		if(player.y < 0) player.y = 0;
+	}
+	if(keystate[ARROW_DOWN]) {
+		player.y += PLAYER_SPEED * CYCLE_SECONDS;
+		if(player.y >= canvas.height) player.y = canvas.height-1;
+	}
+	
+	if(keystate[ARROW_LEFT]) {
+		player.x -= PLAYER_SPEED * CYCLE_SECONDS;
+		if(player.x < 0) player.x = 0;
+	}
+	if(keystate[ARROW_RIGHT]) {
+		player.x += PLAYER_SPEED * CYCLE_SECONDS;
+		if(player.x >= canvas.width) player.x = canvas.width-1;
+	}
 }
 
 function resize_canvas() {
@@ -96,18 +149,27 @@ function ld42_init() {
 	canvas = document.getElementsByTagName('canvas')[0];
 	ctx = canvas.getContext('2d', { alpha: false });
 	
+	player = {
+		'x': canvas.width / 2,
+		'y': canvas.height / 2
+	};
+	
 	let oldTicks = getTicks();
 	let main_loop = function() {
 		let ticks = getTicks() - oldTicks;
-		oldTicks += ticks - (ticks % CYCLE_TICKS);
+		let cycles = Math.floor(ticks / CYCLE_TICKS);
+		oldTicks += cycles * CYCLE_TICKS;
 		
+		while(cycles --> 0) gameLogic();
 		drawFrame();
 		
 		window.setTimeout(main_loop, CYCLE_TICKS - (ticks % CYCLE_TICKS));
 	};
 	
-	resize_canvas();
 	window.onresize = resize_canvas;
+	resize_canvas();
 	
+	document.onkeydown = handleKeyDown;
+	document.onkeyup = handleKeyUp;
 	main_loop();
 }
