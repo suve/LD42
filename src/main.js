@@ -17,9 +17,10 @@
  */
 
 // Game config (yeah, global consts, fight me)
+const TICKS_PER_SECOND = 1000;
 const CYCLES_PER_SECOND = 50;
 const CYCLE_SECONDS = 1 / CYCLES_PER_SECOND;
-const CYCLE_TICKS = Math.floor(1000 / CYCLES_PER_SECOND);
+const CYCLE_TICKS = Math.floor(TICKS_PER_SECOND / CYCLES_PER_SECOND);
 
 // Global vars, fuck yeah
 var appstart;
@@ -28,6 +29,28 @@ var canvas, ctx;
 function getTicks() {
 	var d = new Date();
 	return d.getTime() - appstart;
+}
+
+var fpsTicks, fpsOld, fpsNow;
+
+function countFPS() {
+	let tikk = getTicks();
+	
+	if(fpsTicks) {
+		fpsNow += 1;
+		
+		if(tikk - fpsTicks >= TICKS_PER_SECOND) {
+			fpsOld = fpsNow;
+			fpsNow = 0;
+			fpsTicks += TICKS_PER_SECOND;
+		}
+	} else {
+		fpsNow = 1;
+		fpsOld = '?';
+		fpsTicks = tikk;
+	}
+	
+	return fpsOld;
 }
 
 function fillRect(x,y,w,h,col) {
@@ -44,7 +67,9 @@ function drawFrame() {
 	ctx.font = '48px serif';
 	ctx.fillStyle = 'white';
 	ctx.textBaseline = 'top';
-	ctx.fillText('Hello world', 36, 20);
+	
+	let fps = countFPS();
+	ctx.fillText(fps + 'FPS', 36, 20);
 }
 
 function resize_canvas() {
