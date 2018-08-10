@@ -76,7 +76,7 @@ function fillRect(x,y,w,h,col) {
 }
 
 function printText(x, y, text, size, colour) {
-	if(size !== null) ctx.font = size+'px serif';
+	if(size !== null) ctx.font = size+'px monospace';
 	if(colour !== null) ctx.fillStyle = colour;
 	
 	ctx.textBaseline = 'top';
@@ -85,7 +85,7 @@ function printText(x, y, text, size, colour) {
 
 function drawFrame() {
 	fillRect(0, 0, null, null, 'black');
-	ctx.drawImage(playerGfx, player.frame*8, 0, 8, 8, Math.floor(player.x), Math.floor(player.y), 8, 8);
+	ctx.drawImage(playerGfx, player.frame*8, player.facing*8, 8, 8, Math.floor(player.x), Math.floor(player.y), 8, 8);
 	
 	let fps = countFPS();
 	printText(0, 0, fps+'FPS', 12, 'white');
@@ -133,10 +133,14 @@ function gameLogic() {
 	}
 	
 	if(keystate[ARROW_LEFT]) {
+		player.facing = FACING_LEFT;
+		
 		player.x -= PLAYER_SPEED * CYCLE_SECONDS;
 		if(player.x < 0) player.x = 0;
 	}
 	if(keystate[ARROW_RIGHT]) {
+		player.facing = FACING_RIGHT;
+		
 		player.x += PLAYER_SPEED * CYCLE_SECONDS;
 		if(player.x >= canvas.width) player.x = canvas.width-1;
 	}

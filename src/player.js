@@ -18,9 +18,13 @@
 const ANIM_FRAMES_PER_SECOND = 12;
 const ANIM_TICKS_PER_FRAME = Math.floor(TICKS_PER_SECOND / ANIM_FRAMES_PER_SECOND);
 
+const FACING_LEFT = 1;
+const FACING_RIGHT = 0;
+
 function Player(x, y) {
 	this.x = x;
 	this.y = y;
+	this.facing = FACING_RIGHT;
 	
 	this.animate = function(dt) {
 		this.animationTicks += dt;
