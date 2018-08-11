@@ -23,7 +23,7 @@ SOUNDS_BUILD := $(SOUNDS_DEVEL:sfx/%.wav=build/%.wav)
 SOURCES_DEVEL := $(shell ls src/*.js)
 SOURCES_BUILD := $(SOURCES_DEVEL:src/%.js=build/%.js)
 
-all: build/index.html build/style.css $(SOURCES_BUILD) $(GRAPHICS_BUILD) $(SOUNDS_BUILD)
+all: build/index.html build/style.css build/map.js $(SOURCES_BUILD) $(GRAPHICS_BUILD) $(SOUNDS_BUILD)
 
 build/%.html: src/%.html
 	mkdir -p build
@@ -32,6 +32,9 @@ build/%.html: src/%.html
 build/%.css: src/%.css
 	mkdir -p build
 	cp "$<" "$@"
+
+build/map.js: map/test.png src/map-to-js.php
+	src/map-to-js.php "$<" > "$@"
 
 build/%.js: src/%.js
 	mkdir -p build
