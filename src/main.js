@@ -275,7 +275,31 @@ function checkPlayerDeath() {
 	return false;
 }
 
+var __playtimeLevel = 0;
+
+function playtimeAchievementCheck() {
+	const PlaytimeThresholds = [
+		TICKS_PER_SECOND * 30,
+		TICKS_PER_SECOND * 60,
+		TICKS_PER_SECOND * 60 * 3,
+		TICKS_PER_SECOND * 60 * 5,
+		TICKS_PER_SECOND * 60 * 10,
+		TICKS_PER_SECOND * 60 * 15,
+		TICKS_PER_SECOND * 60 * 30,
+	];
+	
+	if(__playtimeLevel >= PlaytimeThresholds.length) return;
+	
+	let ticks = getTicks();
+	if(ticks < PlaytimeThresholds[__playtimeLevel]) return;
+	
+	Achievements.add(ACHIEV_PLAYTIME, true);
+	__playtimeLevel += 1;
+}
+
 function gameLogic() {
+	playtimeAchievementCheck();
+	
 	if(player.dead !== null) {
 		player.dead += CYCLE_SECONDS;
 		if(player.dead > DEATH_TIME) resetLevel();
