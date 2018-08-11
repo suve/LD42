@@ -85,7 +85,7 @@ for($y = 0; $y < $h; ++$y) {
 	}
 }
 
-echo "var map = [\n";
+echo "var mapdata = [\n";
 for($y = 0; $y < $h; ++$y) {
 	echo "\t[" . implode(', ', $pixels[$y]) . "],\n";
 }

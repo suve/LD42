@@ -39,10 +39,10 @@ const ARROW_DOWN = 40;
 var appstart;
 var canvas, ctx;
 var keystate = [];
+var map;
 var player;
-var pipe;
 
-var playerGfx;
+var playerGfx, worldGfx;
 var jumpSfx, landSfx;
 
 function getTicks() {
@@ -89,9 +89,16 @@ function printText(x, y, text, size, colour) {
 }
 
 function drawFrame() {
-	fillRect(0, 0, null, null, 'black');
-	// fillRect(pipe.x, pipe.y - pipe.h, pipe.w, pipe.h, 'red');
-	fillRect(0, GROUND_Y, null, null, 'green');
+	for(let y = 0; y < map.h; ++y) {
+		for(let x = 0; x < map.w; ++x) {
+			let type = map.data[y][x];
+			if(type) {
+				ctx.drawImage(worldGfx, 0, (type-1)*8, 8, 8, x*8, y*8, 8, 8);
+			} else {
+				fillRect(x*8, y*8, 8, 8, '#00c0ff');
+			}
+		}
+	}
 	
 	let frame = player.frame;
 	if(player.jumping()) frame = 3;
@@ -166,12 +173,6 @@ function gameLogic() {
 			player.velocity = null;
 			landSfx.play();
 		}
-		/*
-		else if(overlap(player, pipe)) {
-			player.y = pipe.y - pipe.h;
-			player.velocity = null;
-		}
-		*/
 		
 		airFactor = AIR_CONTROL;
 	}
@@ -181,16 +182,14 @@ function gameLogic() {
 		
 		let oldX = player.x;
 		player.x -= PLAYER_SPEED * CYCLE_SECONDS * airFactor;
-		//if(player.x < 0 || overlap(player, pipe)) player.x = oldX;
-		if(player.x < 0) player.x = oldX;
+		if(map.collides(player.x, player.y-1) || map.collides(player.x, player.y-player.h)) player.x = oldX;
 	}
 	if(keystate[ARROW_RIGHT]) {
 		player.facing = FACING_RIGHT;
 		
 		let oldX = player.x;
 		player.x += PLAYER_SPEED * CYCLE_SECONDS * airFactor;
-		//if(player.x >= canvas.width || overlap(player, pipe)) player.x = oldX;
-		if(player.x >= canvas.width) player.x = oldX;
+		if(map.collides(player.x+player.w-1, player.y-1) || map.collides(player.x+player.w-1, player.y-player.h)) player.x = oldX;
 	}
 	
 	let anyKey = keystate[ARROW_LEFT] || keystate[ARROW_RIGHT];
@@ -224,17 +223,11 @@ function ld42_init() {
 	canvas = document.getElementsByTagName('canvas')[0];
 	ctx = canvas.getContext('2d', { alpha: false });
 	
-	player = new Player(canvas.width / 4, GROUND_Y);
+	player = new Player(0, canvas.height-16);
 	playerGfx = Assets.addGfx("../gfx/hero-8px.png");
+	worldGfx = Assets.addGfx("../gfx/world-8px.png");
 	jumpSfx = Assets.addSfx("../sfx/jump.wav");
 	landSfx = Assets.addSfx("../sfx/ground.wav");
-	
-	pipe = {
-		'x': (1.0 + Math.random()) * (canvas.width / 3),
-		'y': GROUND_Y,
-		'w': (1.0 + Math.random()) * (canvas.width / 24),
-		'h': Math.floor((1.0 + Math.random()) * (GRAVITY / 3.0))
-	};
 	
 	let loaded = false;
 	let oldTicks = getTicks();
@@ -256,6 +249,8 @@ function ld42_init() {
 	
 	window.onresize = resize_canvas;
 	resize_canvas();
+	
+	map = new Map(mapdata);
 	
 	document.onkeydown = handleKeyDown;
 	document.onkeyup = handleKeyUp;
