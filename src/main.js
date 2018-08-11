@@ -162,7 +162,7 @@ function overlap(x1, y1, w1, h1, x2, y2, w2, h2) {
 function gameLogic() {
 	if((keystate[ARROW_UP]) && (player.velocity === null)) {
 		player.velocity = -PLAYER_JUMP_FORCE;
-		jumpSfx.play();
+		Sfx.play(jumpSfx);
 		Achievements.add(ACHIEV_JUMP);
 	}
 	
@@ -176,7 +176,7 @@ function gameLogic() {
 				if(player.y-player.h < 0) {
 					Achievements.add(ACHIEV_SKY);
 				} else if(player.velocity <= OUCH_SFX_THRESHOLD) {
-					ouchSfx.play();
+					Sfx.play(ouchSfx);
 					Achievements.add(ACHIEV_OUCH);
 				}
 				
@@ -186,7 +186,7 @@ function gameLogic() {
 		} else {
 			if(map.collides(player.x, player.y) || map.collides(player.x + player.w - 1, player.y)) {
 				if(player.velocity >= LAND_SFX_THRESHOLD) {
-					landSfx.play();
+					Sfx.play(landSfx);
 					Achievements.add(ACHIEV_LAND);
 				}
 				

@@ -30,7 +30,7 @@ function __achievements() {
 		if(!this.list[achiev]) {
 			this.list[achiev] = 0; // 1;
 			this.stack.push(achiev);
-			achievSfx.play();
+			Sfx.play(achievSfx);
 		} else {
 			this.list[achiev] += 1;
 		}

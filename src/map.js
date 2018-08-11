@@ -88,7 +88,7 @@ function Map(data) {
 		this.canvas = document.createElement('canvas');
 		this.canvas.width = this.w * 8;
 		this.canvas.height = this.h * 8;
-		this.ctx2d = this.canvas.getContext('2d');
+		this.ctx2d = this.canvas.getContext('2d', { 'alpha': false });
 	};
 	
 	this.__render = function() {
