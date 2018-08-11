@@ -222,6 +222,8 @@ function gameLogic() {
 			player.velocity = 0;
 		}
 	}
+	
+	coins.decay(CYCLE_TICKS);
 	coins.collect(player.x, player.y-1);
 	coins.collect(player.x+player.w-1, player.y-1);
 	coins.collect(player.x, player.y-player.h);

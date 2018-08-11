@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program (LICENCE.txt). 
+ * along with this program (LICENCE.txt).
  * If not, see <http://www.gnu.org/licenses/>.
  */
 const COIN_ANIM_FRAMES = 4;
@@ -26,7 +26,7 @@ function Coins(map) {
 	for(let y = 0; y < map.h; ++y) {
 		for(let x = 0; x < map.w; ++x) {
 			if(map.data[y][x] == -1) {
-				this.__list.push({'x': x, 'y': y});
+				this.__list.push({'x': x, 'y': y, 'dead': null});
 			}
 		}
 	}
@@ -47,19 +47,44 @@ function Coins(map) {
 			
 			if((e.x === x) && (e.y === y)) {
 				Sfx.play(coinSfx);
-				this.__list.splice(idx, 1);
+				e.dead = 0;
 				return;
 			}
 		}
 	};
 	
+	this.decay = function(dt) {
+		let count = this.__list.length;
+		
+		let idx = 0;
+		while(idx < count) {
+			let e = this.__list[idx];
+			if(e.dead !== null) {
+				e.dead += dt;
+				if(e.dead >= COIN_ANIM_FRAMES * (COIN_ANIM_TICKS / 2)) {
+					this.__list.splice(idx, 1);
+					--count;
+					
+					continue;
+				}
+			}
+			
+			++idx;
+		}
+	}
+	
 	this.render = function() {
-		let frame = Math.floor(getTicks() / COIN_ANIM_TICKS) % COIN_ANIM_FRAMES;
+		let liveFrame = Math.floor(getTicks() / COIN_ANIM_TICKS) % COIN_ANIM_FRAMES;
 		
 		let count = this.__list.length;
 		for(let idx = 0; idx < count; ++idx) {
 			let e = this.__list[idx];
-			ctx.drawImage(coinGfx, frame*8, 0, 8, 8, e.x*8, e.y*8, 8, 8);
+			if(e.dead === null) {
+				ctx.drawImage(coinGfx, liveFrame*8, 0, 8, 8, e.x*8, e.y*8, 8, 8);
+			} else {
+				let deadFrame = Math.floor(e.dead / (COIN_ANIM_TICKS / 2));
+				ctx.drawImage(coinGfx, deadFrame*8, 8, 8, 8, e.x*8, e.y*8, 8, 8);
+			}
 		}
 	};
 }
