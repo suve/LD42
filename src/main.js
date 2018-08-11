@@ -27,7 +27,7 @@ const PLAYER_ACCEL = 360 / 8;
 const PLAYER_MAX_SPEED = 96 / 8;
 const PLAYER_JUMP_FORCE = 88 / 8;
 const GRAVITY = 88 / 8;
-const LAND_SFX_THRESHOLD = GRAVITY / 2;
+const LAND_SFX_THRESHOLD = GRAVITY * 0.75;
 const OUCH_SFX_THRESHOLD = -PLAYER_JUMP_FORCE / 2;
 const AIR_CONTROL = 0.33;
 
@@ -257,7 +257,7 @@ function calculatePlayerMovement() {
 	}
 	
 	if(player.yVel === null) {
-		if(!(map.collides(player.x, player.y) || map.collides(player.x + player.w - 1, player.y))) {
+		if(!(map.collides(player.x, player.y) || map.collides(player.x + player.w, player.y))) {
 			player.yVel = 0;
 		}
 	}
@@ -347,7 +347,7 @@ function resize_canvas() {
 function resetLevel() {
 	map = new Map(mapdata);
 	coins = new Coins(map);
-	player = new Player(0, 23);
+	player = new Player(0, map.h-5);
 }
 
 function ld42_init() {
