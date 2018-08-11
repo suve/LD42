@@ -25,8 +25,8 @@ const CYCLE_TICKS = Math.floor(TICKS_PER_SECOND / CYCLES_PER_SECOND);
 
 const PLAYER_SPEED = 96;
 const GRAVITY = 88;
-const PLAYER_JUMP_FORCE = 100;
-const GROUND_Y = 164;
+const PLAYER_JUMP_FORCE = 84;
+const LAND_SFX_THRESHOLD = GRAVITY / 2;
 const AIR_CONTROL = 1;
 
 // Ugh
@@ -171,12 +171,12 @@ function gameLogic() {
 		if(player.velocity < 0) {
 			if(map.collides(player.x, player.y-player.h) || map.collides(player.x + player.w - 1, player.y-player.h)) {
 				ouchSfx.play();
-				player.y = Math.floor(player.y-player.h);
+				player.y = (Math.floor(player.y / 8)+1)*8;
 				player.velocity = 0;
 			}
 		} else {
 			if(map.collides(player.x, player.y) || map.collides(player.x + player.w - 1, player.y)) {
-				landSfx.play();
+				if(player.velocity >= LAND_SFX_THRESHOLD) landSfx.play();
 				player.y = Math.floor(player.y / 8)*8;
 				player.velocity = null;
 			}
@@ -185,8 +185,10 @@ function gameLogic() {
 		airFactor = AIR_CONTROL;
 	}
 	
+	let moved = false;
 	if(keystate[ARROW_LEFT]) {
 		player.facing = FACING_LEFT;
+		moved = true;
 		
 		let oldX = player.x;
 		player.x -= PLAYER_SPEED * CYCLE_SECONDS * airFactor;
@@ -194,10 +196,17 @@ function gameLogic() {
 	}
 	if(keystate[ARROW_RIGHT]) {
 		player.facing = FACING_RIGHT;
+		moved = true;
 		
 		let oldX = player.x;
 		player.x += PLAYER_SPEED * CYCLE_SECONDS * airFactor;
 		if(map.collides(player.x+player.w-1, player.y-1) || map.collides(player.x+player.w-1, player.y-player.h)) player.x = oldX;
+	}
+	
+	if(moved && (player.velocity === null)) {
+		if(!(map.collides(player.x, player.y) || map.collides(player.x + player.w - 1, player.y))) {
+			player.velocity = 0;
+		}
 	}
 	
 	let anyKey = keystate[ARROW_LEFT] || keystate[ARROW_RIGHT];
