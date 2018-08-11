@@ -43,7 +43,7 @@ var map;
 var player;
 
 var playerGfx, worldGfx;
-var jumpSfx, landSfx;
+var jumpSfx, landSfx, ouchSfx;
 
 function getTicks() {
 	var d = new Date();
@@ -166,12 +166,20 @@ function gameLogic() {
 	let airFactor = 1;
 	if(player.velocity !== null) {
 		player.velocity += GRAVITY * CYCLE_SECONDS;
-		
 		player.y += player.velocity * CYCLE_SECONDS;
-		if(player.y >= GROUND_Y) {
-			player.y = GROUND_Y;
-			player.velocity = null;
-			landSfx.play();
+		
+		if(player.velocity < 0) {
+			if(map.collides(player.x, player.y-player.h) || map.collides(player.x + player.w - 1, player.y-player.h)) {
+				ouchSfx.play();
+				player.y = Math.floor(player.y-player.h);
+				player.velocity = 0;
+			}
+		} else {
+			if(map.collides(player.x, player.y) || map.collides(player.x + player.w - 1, player.y)) {
+				landSfx.play();
+				player.y = Math.floor(player.y / 8)*8;
+				player.velocity = null;
+			}
 		}
 		
 		airFactor = AIR_CONTROL;
@@ -228,6 +236,7 @@ function ld42_init() {
 	worldGfx = Assets.addGfx("../gfx/world-8px.png");
 	jumpSfx = Assets.addSfx("../sfx/jump.wav");
 	landSfx = Assets.addSfx("../sfx/ground.wav");
+	ouchSfx = Assets.addSfx("../sfx/hit-head.wav");
 	
 	let loaded = false;
 	let oldTicks = getTicks();
