@@ -44,7 +44,7 @@ var map;
 var player;
 
 var playerGfx, worldGfx;
-var jumpSfx, landSfx, ouchSfx;
+var achievSfx, jumpSfx, landSfx, ouchSfx;
 
 function getTicks() {
 	var d = new Date();
@@ -81,6 +81,14 @@ function fillRect(x,y,w,h,col) {
 	ctx.fillRect(Math.floor(x), Math.floor(y), Math.floor(w), Math.floor(h));
 }
 
+function fillCircle(x,y,r,col) {
+	if(col !== null) ctx.fillStyle = col;
+	
+	ctx.beginPath();
+	ctx.arc(Math.floor(x), Math.floor(y), Math.floor(r), 0, Math.PI*2);
+	ctx.fill();
+}
+
 function printText(x, y, text, size, colour) {
 	if(size !== null) ctx.font = size+'px monospace';
 	if(colour !== null) ctx.fillStyle = colour;
@@ -96,6 +104,8 @@ function drawFrame() {
 	if(player.jumping()) frame = 3;
 	if(player.falling()) frame = 4;
 	ctx.drawImage(playerGfx, frame*8, player.facing*8, 8, 8, Math.floor(player.x), Math.floor(player.y)-8, 8, 8);
+	
+	Achievements.render();
 	
 	let fps = countFPS();
 	printText(0, 0, fps+'FPS', 12, 'white');
@@ -153,6 +163,7 @@ function gameLogic() {
 	if((keystate[ARROW_UP]) && (player.velocity === null)) {
 		player.velocity = -PLAYER_JUMP_FORCE;
 		jumpSfx.play();
+		Achievements.add(ACHIEV_JUMP);
 	}
 	
 	let airFactor = 1;
@@ -162,13 +173,23 @@ function gameLogic() {
 		
 		if(player.velocity < 0) {
 			if(map.collides(player.x, player.y-player.h) || map.collides(player.x + player.w - 1, player.y-player.h)) {
-				if(player.velocity <= OUCH_SFX_THRESHOLD) ouchSfx.play();
+				if(player.y-player.h < 0) {
+					Achievements.add(ACHIEV_SKY);
+				} else if(player.velocity <= OUCH_SFX_THRESHOLD) {
+					ouchSfx.play();
+					Achievements.add(ACHIEV_OUCH);
+				}
+				
 				player.y = (Math.floor(player.y / 8)+1)*8;
 				player.velocity = 0;
 			}
 		} else {
 			if(map.collides(player.x, player.y) || map.collides(player.x + player.w - 1, player.y)) {
-				if(player.velocity >= LAND_SFX_THRESHOLD) landSfx.play();
+				if(player.velocity >= LAND_SFX_THRESHOLD) {
+					landSfx.play();
+					Achievements.add(ACHIEV_LAND);
+				}
+				
 				player.y = Math.floor(player.y / 8)*8;
 				player.velocity = null;
 			}
@@ -230,11 +251,12 @@ function ld42_init() {
 	appstart = (new Date()).getTime();
 	
 	canvas = document.getElementById('ld42');
-	ctx = canvas.getContext('2d', { alpha: false });
+	ctx = canvas.getContext('2d', { 'alpha': false });
 	
-	player = new Player(0, canvas.height-16);
 	playerGfx = Assets.addGfx("../gfx/hero-8px.png");
 	worldGfx = Assets.addGfx("../gfx/world-8px.png");
+	
+	achievSfx = Assets.addSfx("../sfx/achiev.wav");
 	jumpSfx = Assets.addSfx("../sfx/jump.wav");
 	landSfx = Assets.addSfx("../sfx/ground.wav");
 	ouchSfx = Assets.addSfx("../sfx/hit-head.wav");
@@ -261,6 +283,8 @@ function ld42_init() {
 	resize_canvas();
 	
 	map = new Map(mapdata);
+	player = new Player(0, canvas.height-16);
+	Achievements.reset();
 	
 	document.onkeydown = handleKeyDown;
 	document.onkeyup = handleKeyUp;

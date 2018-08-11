@@ -1,4 +1,4 @@
-# LF42
+# LD42
 # Copyright (C) 2018 Artur "suve" Iwicki
 #
 # This program is free software: you can redistribute it and/or modify
@@ -34,6 +34,7 @@ build/%.css: src/%.css
 	cp "$<" "$@"
 
 build/mapdata.js: map/test.png src/map-to-js.php
+	mkdir -p build
 	src/map-to-js.php "$<" > "$@"
 
 build/%.js: src/%.js
