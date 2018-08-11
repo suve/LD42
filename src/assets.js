@@ -24,7 +24,10 @@ function __assets() {
 		img.alt = path;
 
 		document.body.appendChild(img);
-		this.__list.push(img);
+		this.__list.push({
+			'path': path,
+			'elem': img
+		});
 		
 		return img;
 	};
@@ -36,7 +39,10 @@ function __assets() {
 		sfx.type = 'audio/wav';
 
 		document.body.appendChild(sfx);
-		this.__list.push(sfx);
+		this.__list.push({
+			'path': path,
+			'elem': sfx
+		});
 		
 		return sfx;
 	};
@@ -58,13 +64,13 @@ function __assets() {
 			let it = this.__list[idx];
 			
 			let ready;
-			if(it instanceof HTMLMediaElement)
-				ready = (it.readyState == HTMLMediaElement.HAVE_ENOUGH_DATA);
+			if(it.elem instanceof HTMLMediaElement)
+				ready = (it.elem.readyState == HTMLMediaElement.HAVE_ENOUGH_DATA);
 			else
-				ready = it.complete;
+				ready = it.elem.complete;
 			
 			result.push({
-				'path': it.src,
+				'path': it.path,
 				'ready': ready
 			});
 		}
