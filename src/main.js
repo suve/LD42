@@ -44,7 +44,7 @@ var keystate = [];
 var coins, map;
 var player;
 
-var coinGfx, playerGfx, worldGfx;
+var achievGfx, coinGfx, playerGfx, worldGfx;
 var achievSfx, coinSfx, jumpSfx, landSfx, ouchSfx;
 
 function getTicks() {
@@ -279,6 +279,7 @@ function ld42_init() {
 	canvas = document.getElementById('ld42');
 	ctx = canvas.getContext('2d', { 'alpha': false });
 	
+	achievGfx = Assets.addGfx("../gfx/achievements.png");
 	playerGfx = Assets.addGfx("../gfx/hero-8px.png");
 	worldGfx = Assets.addGfx("../gfx/world-8px.png");
 	coinGfx = Assets.addGfx("../gfx/coin-8px.png");

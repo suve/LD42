@@ -16,9 +16,12 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 const ACHIEV_JUMP = 0;
-const ACHIEV_LAND = 1;
-const ACHIEV_OUCH = 2;
-const ACHIEV_SKY  = 3;
+const ACHIEV_COIN = 1;
+const ACHIEV_LAND = 2;
+const ACHIEV_OUCH = 3;
+const ACHIEV_SKY  = 4;
+
+const AchievementSteps = [1, 5, 10, 25, 50];
 
 function __achievements() {
 	this.reset = function() {
@@ -27,12 +30,17 @@ function __achievements() {
 	};
 	
 	this.add = function(achiev) {
-		if(!this.list[achiev]) {
-			this.list[achiev] = 1;
-			this.stack.push(achiev);
-			Sfx.play(achievSfx);
-		} else {
-			this.list[achiev] += 1;
+		if(!this.list[achiev]) this.list[achiev] = 0;
+		this.list[achiev] += 1;
+		
+		let steps = AchievementSteps.length;
+		for(let idx = 0; idx < steps; ++idx) {
+			if(this.list[achiev] == AchievementSteps[idx]) {
+				this.stack.push({'type': achiev, 'step': idx});
+				Sfx.play(achievSfx);
+				
+				return;
+			}
 		}
 	};
 	
@@ -51,7 +59,8 @@ function __achievements() {
 		
 		let count = this.stack.length;
 		for(let idx = 0; idx < count; ++idx) {
-			fillCircle(x + HalfSize, y + HalfSize, HalfSize, 'yellow');
+			let a = this.stack[idx];
+			ctx.drawImage(achievGfx, AchievSize * a.step, AchievSize * a.type, AchievSize, AchievSize, x, y, AchievSize, AchievSize);
 			
 			if(dir === 'r') {
 				x += AchievSize;

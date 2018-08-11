@@ -46,6 +46,7 @@ function Coins(map) {
 			let e = this.__list[idx];
 			
 			if((e.x === x) && (e.y === y)) {
+				Achievements.add(ACHIEV_COIN);
 				Sfx.play(coinSfx);
 				e.dead = 0;
 				return;
