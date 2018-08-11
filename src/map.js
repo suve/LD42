@@ -85,21 +85,24 @@ function Map(data) {
 	};
 	
 	this.__renderQuart = function(tile, dx, dy, qx, qy, mapped) {
-		this.ctx2d.drawImage(worldGfx, qx + mapped*8, qy + (tile-1)*8, 4, 4, dx+qx, dy+qy, 4, 4);
+		this.ctx2d.drawImage(worldGfx, qx*8 + mapped*8, qy*8 + (tile-1)*8, 4, 4, dx+qx*this.canvasScale, dy+qy*this.canvasScale, this.canvasScale/2, this.canvasScale/2);
 	};
 	
 	this.__renderTile = function(tile, quarts, dx, dy) {
 		const QuartMap = [3,1,2,4,3,1,2,0];
-		this.__renderQuart(tile, dx, dy, 0, 0, QuartMap[quarts.tl]);
-		this.__renderQuart(tile, dx, dy, 4, 0, QuartMap[quarts.tr]);
-		this.__renderQuart(tile, dx, dy, 4, 4, QuartMap[quarts.br]);
-		this.__renderQuart(tile, dx, dy, 0, 4, QuartMap[quarts.bl]);
+		this.__renderQuart(tile, dx, dy,   0,   0, QuartMap[quarts.tl]);
+		this.__renderQuart(tile, dx, dy, 0.5,   0, QuartMap[quarts.tr]);
+		this.__renderQuart(tile, dx, dy, 0.5, 0.5, QuartMap[quarts.br]);
+		this.__renderQuart(tile, dx, dy,   0, 0.5, QuartMap[quarts.bl]);
 	}
 	
 	this.__allocCanvas = function() {
+		this.canvasScale = viewport.getScale();
+		
 		this.canvas = document.createElement('canvas');
-		this.canvas.width = this.w * 8;
-		this.canvas.height = this.h * 8;
+		this.canvas.width = this.w * this.canvasScale;
+		this.canvas.height = this.h * this.canvasScale;
+		
 		this.ctx2d = this.canvas.getContext('2d', { 'alpha': false });
 	};
 	
@@ -141,12 +144,18 @@ function Map(data) {
 	};
 	
 	this.draw = function() {
-		if(this.canvas === null) this.__render(true);
+		if(this.canvas === null) {
+			this.__render(true);
+		} else {
+			let scale = viewport.getScale();
+			if(scale != this.canvasScale) this.__render(true);
+		}
 		
 		ctx.drawImage(this.canvas, 0, 0);
 	}
 	
 	// Init
 	this.canvas = null;
+	this.canvasScale = null;
 	this.__copyData(data);
 }
