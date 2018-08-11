@@ -116,7 +116,7 @@ function Map(data) {
 		for(let y = 0; y < this.h; ++y) {
 			for(let x = 0; x < this.w; ++x) {
 				let type = this.data[y][x];
-				if(type > 0) this.__renderTile(type, this.quarts[y][x], x*8, y*8);
+				if(type > 0) this.__renderTile(type, this.quarts[y][x], x*this.canvasScale, y*this.canvasScale);
 			}
 		}
 		

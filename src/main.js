@@ -42,7 +42,7 @@ const ARROW_DOWN = 40;
 
 // Global vars, fuck yeah
 var appstart;
-var canvas, ctx, viewport;
+var canvas, ctx, ctxOrg, viewport;
 var keystate = [];
 var coins, map;
 var player;
@@ -102,16 +102,20 @@ function printText(x, y, text, size, colour) {
 }
 
 function drawFrame() {
+	let scale = viewport.getScale();
+	viewport.update(player);
+	ctx.restore(); ctx.save();
+	ctx.translate(-Math.floor(viewport.x * scale), -Math.floor(viewport.y * scale));
+	
 	map.draw();
 	coins.render();
-	
-	let scale = viewport.getScale();
 	
 	let frame = player.frame;
 	if(player.jumping()) frame = 3;
 	if(player.falling()) frame = 4;
 	ctx.drawImage(playerGfx, frame*8, player.facing*8, 8, 8, Math.floor(player.x*scale), Math.floor((player.y-1)*scale), scale, scale);
 	
+	ctx.restore(); ctx.save();
 	Achievements.render();
 	
 	if(player.dead !== null) {
@@ -351,6 +355,7 @@ function ld42_init() {
 	
 	canvas = document.getElementById('ld42');
 	ctx = canvas.getContext('2d', { 'alpha': false });
+	ctx.save();
 	viewport = new Viewport();
 	
 	achievGfx = Assets.addGfx("../gfx/achievements.png");
