@@ -29,6 +29,7 @@ function Player(x, y) {
 	this.facing = FACING_RIGHT;
 	this.xVel = 0;
 	this.yVel = null;
+	this.dead = null;
 	
 	this.animate = function(dt) {
 		this.animationTicks += dt;

@@ -31,6 +31,9 @@ const LAND_SFX_THRESHOLD = GRAVITY / 2;
 const OUCH_SFX_THRESHOLD = -PLAYER_JUMP_FORCE / 2;
 const AIR_CONTROL = 0.33;
 
+const DEATH_TIME = 0.48;
+const DEATH_ANIM_TIME = DEATH_TIME * 0.9;
+
 // Ugh
 const ARROW_LEFT = 37;
 const ARROW_UP = 38;
@@ -108,6 +111,14 @@ function drawFrame() {
 	ctx.drawImage(playerGfx, frame*8, player.facing*8, 8, 8, Math.floor(player.x), Math.floor(player.y)-8, 8, 8);
 	
 	Achievements.render();
+	
+	if(player.dead !== null) {
+		let perc = player.dead / DEATH_ANIM_TIME;
+		let wid = canvas.width / 2 * perc;
+		
+		fillRect(0, 0, wid, null, 'black');
+		fillRect(canvas.width-wid+1, 0, wid, null, 'black');
+	}
 	
 	let fps = countFPS();
 	printText(0, 0, fps+'FPS', 12, 'white');
@@ -265,9 +276,16 @@ function checkPlayerDeath() {
 }
 
 function gameLogic() {
+	if(player.dead !== null) {
+		player.dead += CYCLE_SECONDS;
+		if(player.dead > DEATH_TIME) resetLevel();
+		
+		return;
+	}
+	
 	calculatePlayerMovement();
 	if(checkPlayerDeath()) {
-		resetLevel();
+		player.dead = 0;
 		return;
 	}
 	
