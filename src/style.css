@@ -18,14 +18,19 @@
 body { 
 	padding: 0;
 	margin: 0;
+	background-color: black;
 }
 
 canvas {
+	display: none;
+}
+
+canvas#ld42 {
 	display: block;
 	image-rendering: pixelated;
 	margin: 0 auto;
 }
 
 audio, img {
-	display:none;
+	display: none;
 }

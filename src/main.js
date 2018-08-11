@@ -90,7 +90,6 @@ function printText(x, y, text, size, colour) {
 }
 
 function drawFrame() {
-	fillRect(0, 0, null, null, '#00c0ff');
 	map.draw();
 	
 	let frame = player.frame;
@@ -230,7 +229,7 @@ function resize_canvas() {
 function ld42_init() {
 	appstart = (new Date()).getTime();
 	
-	canvas = document.getElementsByTagName('canvas')[0];
+	canvas = document.getElementById('ld42');
 	ctx = canvas.getContext('2d', { alpha: false });
 	
 	player = new Player(0, canvas.height-16);

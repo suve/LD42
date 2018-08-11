@@ -19,6 +19,7 @@ function Map(data) {
 	this.data = data;
 	this.h = data.length;
 	this.w = data[0].length;
+	this.canvas = null;
 	
 	this.__stickQuart = function(tile, neighbour, sticky) {
 		return sticky ? (neighbour > 0) : (neighbour == tile);
@@ -72,7 +73,7 @@ function Map(data) {
 	};
 	
 	this.__renderQuart = function(tile, dx, dy, qx, qy, mapped) {
-		ctx.drawImage(worldGfx, qx + mapped*8, qy + (tile-1)*8, 4, 4, dx+qx, dy+qy, 4, 4);
+		this.ctx2d.drawImage(worldGfx, qx + mapped*8, qy + (tile-1)*8, 4, 4, dx+qx, dy+qy, 4, 4);
 	};
 	
 	this.__renderTile = function(tile, quarts, dx, dy) {
@@ -82,6 +83,30 @@ function Map(data) {
 		this.__renderQuart(tile, dx, dy, 4, 4, QuartMap[quarts.br]);
 		this.__renderQuart(tile, dx, dy, 0, 4, QuartMap[quarts.bl]);
 	}
+	
+	this.__allocCanvas = function() {
+		this.canvas = document.createElement('canvas');
+		this.canvas.width = this.w * 8;
+		this.canvas.height = this.h * 8;
+		this.ctx2d = this.canvas.getContext('2d');
+	};
+	
+	this.__render = function() {
+		this.__allocCanvas();
+		
+		this.ctx2d.fillStyle = '#00c0ff';
+		this.ctx2d.fillRect(0, 0, this.canvas.width, this.canvas.height);
+		
+		this.__calculateQuarts();
+		for(let y = 0; y < this.h; ++y) {
+			for(let x = 0; x < this.w; ++x) {
+				let type = this.data[y][x];
+				if(type) this.__renderTile(type, this.quarts[y][x], x*8, y*8);
+			}
+		}
+		
+		this.quarts = null;
+	};
 	
 	this.collides = function(x, y) {
 		x = Math.floor(x / 8);
@@ -94,15 +119,8 @@ function Map(data) {
 	}
 	
 	this.draw = function() {
-		for(let y = 0; y < this.h; ++y) {
-			for(let x = 0; x < this.w; ++x) {
-				let type = this.data[y][x];
-				if(type) {
-					this.__renderTile(type, this.quarts[y][x], x*8, y*8);
-				}
-			}
-		}
+		if(this.canvas === null) this.__render();
+		
+		ctx.drawImage(this.canvas, 0, 0);
 	}
-	
-	this.__calculateQuarts();
 }
