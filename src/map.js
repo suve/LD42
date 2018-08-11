@@ -131,8 +131,8 @@ function Map(data) {
 	}
 	
 	this.getTile = function(x, y) {
-		x = Math.floor(x / 8);
-		y = Math.floor(y / 8);
+		x = Math.floor(x);
+		y = Math.floor(y);
 		
 		if((x < 0) || (y < 0)) return null;
 		if((x >= this.w) || (y >= this.h)) return null;

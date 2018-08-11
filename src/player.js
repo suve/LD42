@@ -24,8 +24,8 @@ const FACING_RIGHT = 0;
 function Player(x, y) {
 	this.x = x;
 	this.y = y;
-	this.w = 8;
-	this.h = 8;
+	this.w = 0.95;
+	this.h = 0.95;
 	this.facing = FACING_RIGHT;
 	this.xVel = 0;
 	this.yVel = null;

@@ -23,10 +23,10 @@ const CYCLES_PER_SECOND = 50;
 const CYCLE_SECONDS = 1 / CYCLES_PER_SECOND;
 const CYCLE_TICKS = Math.floor(TICKS_PER_SECOND / CYCLES_PER_SECOND);
 
-const PLAYER_ACCEL = 360;
-const PLAYER_MAX_SPEED = 96;
-const PLAYER_JUMP_FORCE = 84;
-const GRAVITY = 88;
+const PLAYER_ACCEL = 360 / 8;
+const PLAYER_MAX_SPEED = 96 / 8;
+const PLAYER_JUMP_FORCE = 88 / 8;
+const GRAVITY = 88 / 8;
 const LAND_SFX_THRESHOLD = GRAVITY / 2;
 const OUCH_SFX_THRESHOLD = -PLAYER_JUMP_FORCE / 2;
 const AIR_CONTROL = 0.33;
@@ -42,7 +42,7 @@ const ARROW_DOWN = 40;
 
 // Global vars, fuck yeah
 var appstart;
-var canvas, ctx;
+var canvas, ctx, viewport;
 var keystate = [];
 var coins, map;
 var player;
@@ -105,10 +105,12 @@ function drawFrame() {
 	map.draw();
 	coins.render();
 	
+	let scale = viewport.getScale();
+	
 	let frame = player.frame;
 	if(player.jumping()) frame = 3;
 	if(player.falling()) frame = 4;
-	ctx.drawImage(playerGfx, frame*8, player.facing*8, 8, 8, Math.floor(player.x), Math.floor(player.y)-8, 8, 8);
+	ctx.drawImage(playerGfx, frame*8, player.facing*8, 8, 8, Math.floor(player.x*scale), Math.floor((player.y-1)*scale), scale, scale);
 	
 	Achievements.render();
 	
@@ -185,7 +187,7 @@ function calculatePlayerMovement() {
 		player.y += player.yVel * CYCLE_SECONDS;
 		
 		if(player.yVel < 0) {
-			if(map.collides(player.x, player.y-player.h) || map.collides(player.x + player.w - 1, player.y-player.h)) {
+			if(map.collides(player.x, player.y-player.h) || map.collides(player.x + player.w, player.y-player.h)) {
 				if(player.y-player.h < 0) {
 					Achievements.add(ACHIEV_SKY);
 				} else if(player.yVel <= OUCH_SFX_THRESHOLD) {
@@ -193,17 +195,17 @@ function calculatePlayerMovement() {
 					Achievements.add(ACHIEV_OUCH);
 				}
 				
-				player.y = (Math.floor(player.y / 8)+1)*8;
+				player.y = Math.floor(player.y)+1;
 				player.yVel = 0;
 			}
 		} else {
-			if(map.collides(player.x, player.y) || map.collides(player.x + player.w - 1, player.y)) {
+			if(map.collides(player.x, player.y) || map.collides(player.x + player.w, player.y)) {
 				if(player.yVel >= LAND_SFX_THRESHOLD) {
 					Sfx.play(landSfx);
 					Achievements.add(ACHIEV_LAND);
 				}
 				
-				player.y = Math.floor(player.y / 8)*8;
+				player.y = Math.floor(player.y);
 				player.yVel = null;
 			}
 		}
@@ -240,8 +242,8 @@ function calculatePlayerMovement() {
 	if(player.xVel !== 0) {
 		player.x += player.xVel * CYCLE_SECONDS;
 		if(
-			map.collides(player.x, player.y-1) || map.collides(player.x, player.y-player.h) ||
-			map.collides(player.x+player.w-1, player.y-1) || map.collides(player.x+player.w-1, player.y-player.h)
+			map.collides(player.x, player.y-0.05) || map.collides(player.x, player.y-player.h) ||
+			map.collides(player.x+player.w, player.y-0.05) || map.collides(player.x+player.w, player.y-player.h)
 		) {
 			if(Math.abs(player.xVel) >= PLAYER_MAX_SPEED*0.99) Achievements.add(ACHIEV_WALLHIT);
 			
@@ -264,8 +266,8 @@ function calculatePlayerMovement() {
 
 function checkPlayerDeath() {
 	if(
-		map.deadly(player.x, player.y-1) || map.deadly(player.x, player.y-player.h) ||
-		map.deadly(player.x+player.w-1, player.y-1) || map.deadly(player.x+player.w-1, player.y-player.h)
+		map.deadly(player.x, player.y-0.05) || map.deadly(player.x, player.y-player.h) ||
+		map.deadly(player.x+player.w, player.y-0.05) || map.deadly(player.x+player.w, player.y-player.h)
 	) {
 		Achievements.add(ACHIEV_SPIKES);
 		Sfx.play(spikesSfx);
@@ -314,10 +316,10 @@ function gameLogic() {
 	}
 	
 	coins.decay(CYCLE_TICKS);
-	coins.collect(player.x, player.y-1);
-	coins.collect(player.x+player.w-1, player.y-1);
+	coins.collect(player.x, player.y-0.05);
+	coins.collect(player.x+player.w, player.y-0.05);
 	coins.collect(player.x, player.y-player.h);
-	coins.collect(player.x+player.w-1, player.y-player.h);
+	coins.collect(player.x+player.w, player.y-player.h);
 }
 
 function resize_canvas() {
@@ -341,7 +343,7 @@ function resize_canvas() {
 function resetLevel() {
 	map = new Map(mapdata);
 	coins = new Coins(map);
-	player = new Player(0, canvas.height-16);
+	player = new Player(0, 23);
 }
 
 function ld42_init() {
@@ -349,6 +351,7 @@ function ld42_init() {
 	
 	canvas = document.getElementById('ld42');
 	ctx = canvas.getContext('2d', { 'alpha': false });
+	viewport = new Viewport();
 	
 	achievGfx = Assets.addGfx("../gfx/achievements.png");
 	playerGfx = Assets.addGfx("../gfx/hero-8px.png");

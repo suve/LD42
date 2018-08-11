@@ -32,8 +32,8 @@ function Coins(map) {
 	}
 	
 	this.collect = function(x, y) {
-		x = Math.floor(x / 8);
-		y = Math.floor(y / 8);
+		x = Math.floor(x);
+		y = Math.floor(y);
 		
 		if((x < 0) || (y < 0)) return;
 		if((x >= this.__map.w) || (y >= this.__map.h)) return;
@@ -75,16 +75,17 @@ function Coins(map) {
 	}
 	
 	this.render = function() {
+		let scale = viewport.getScale();
 		let liveFrame = Math.floor(getTicks() / COIN_ANIM_TICKS) % COIN_ANIM_FRAMES;
 		
 		let count = this.__list.length;
 		for(let idx = 0; idx < count; ++idx) {
 			let e = this.__list[idx];
 			if(e.dead === null) {
-				ctx.drawImage(coinGfx, liveFrame*8, 0, 8, 8, e.x*8, e.y*8, 8, 8);
+				ctx.drawImage(coinGfx, liveFrame*8, 0, 8, 8, e.x*scale, e.y*scale, scale, scale);
 			} else {
 				let deadFrame = Math.floor(e.dead / (COIN_ANIM_TICKS / 2));
-				ctx.drawImage(coinGfx, deadFrame*8, 8, 8, 8, e.x*8, e.y*8, 8, 8);
+				ctx.drawImage(coinGfx, deadFrame*8, 8, 8, 8, e.x*scale, e.y*scale, scale, scale);
 			}
 		}
 	};
