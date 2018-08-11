@@ -16,13 +16,22 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 const TILE_SPIKES = 3;
+const TILE_DEADLY = TILE_SPIKES;
+
 const TILE_COIN = -1;
 
 function Map(data) {
-	this.data = data;
-	this.h = data.length;
-	this.w = data[0].length;
-	this.canvas = null;
+	this.__copyData = function(data) {
+		this.h = data.length;
+		this.w = data[0].length;
+		
+		let copy = [];
+		for(let y = 0; y < this.h; ++y) {
+			copy[y] = data[y].slice();
+		}
+		
+		this.data = copy;
+	};
 	
 	this.__stickQuart = function(tile, neighbour, sticky) {
 		return sticky ? (neighbour > 0) : (neighbour == tile);
@@ -112,18 +121,32 @@ function Map(data) {
 	};
 	
 	this.collides = function(x, y) {
+		let tile = this.getTile(x, y);
+		return (tile === null) || ((tile > 0) && (tile < TILE_DEADLY));
+	}
+	
+	this.deadly = function(x, y) {
+		let tile = this.getTile(x, y);
+		return tile >= TILE_DEADLY;
+	}
+	
+	this.getTile = function(x, y) {
 		x = Math.floor(x / 8);
 		y = Math.floor(y / 8);
 		
-		if((x < 0) || (y < 0)) return true;
-		if((x >= this.w) || (y >= this.h)) return true;
+		if((x < 0) || (y < 0)) return null;
+		if((x >= this.w) || (y >= this.h)) return null;
 		
-		return this.data[y][x] > 0;
-	}
+		return this.data[y][x];
+	};
 	
 	this.draw = function() {
 		if(this.canvas === null) this.__render(true);
 		
 		ctx.drawImage(this.canvas, 0, 0);
 	}
+	
+	// Init
+	this.canvas = null;
+	this.__copyData(data);
 }

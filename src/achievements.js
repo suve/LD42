@@ -21,6 +21,7 @@ const ACHIEV_LAND    = 2;
 const ACHIEV_OUCH    = 3;
 const ACHIEV_SKY     = 4;
 const ACHIEV_WALLHIT = 5;
+const ACHIEV_SPIKES  = 6;
 
 const AchievementSteps = [1, 5, 10, 25, 50, 75, 100];
 

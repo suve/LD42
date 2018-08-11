@@ -45,7 +45,7 @@ var coins, map;
 var player;
 
 var achievGfx, coinGfx, playerGfx, worldGfx;
-var achievSfx, coinSfx, jumpSfx, landSfx, ouchSfx;
+var achievSfx, coinSfx, jumpSfx, landSfx, spikesSfx, ouchSfx;
 
 function getTicks() {
 	var d = new Date();
@@ -161,7 +161,7 @@ function overlap(x1, y1, w1, h1, x2, y2, w2, h2) {
 	return !( (x2 > x1+w1) || (x2+w2 < x1) || (y2-h2 > y1) || (y2 < y1-h1) );
 }
 
-function gameLogic() {
+function calculatePlayerMovement() {
 	if((keystate[ARROW_UP]) && (player.yVel === null)) {
 		player.yVel = -PLAYER_JUMP_FORCE;
 		Sfx.play(jumpSfx);
@@ -245,16 +245,37 @@ function gameLogic() {
 		}
 	}
 	
+	if(anyKey)
+		player.animate(CYCLE_TICKS);
+	else
+		player.stopAnimation();
+}
+
+function checkPlayerDeath() {
+	if(
+		map.deadly(player.x, player.y-1) || map.deadly(player.x, player.y-player.h) ||
+		map.deadly(player.x+player.w-1, player.y-1) || map.deadly(player.x+player.w-1, player.y-player.h)
+	) {
+		Achievements.add(ACHIEV_SPIKES);
+		Sfx.play(spikesSfx);
+		return true;
+	}
+	
+	return false;
+}
+
+function gameLogic() {
+	calculatePlayerMovement();
+	if(checkPlayerDeath()) {
+		resetLevel();
+		return;
+	}
+	
 	coins.decay(CYCLE_TICKS);
 	coins.collect(player.x, player.y-1);
 	coins.collect(player.x+player.w-1, player.y-1);
 	coins.collect(player.x, player.y-player.h);
 	coins.collect(player.x+player.w-1, player.y-player.h);
-	
-	if(anyKey)
-		player.animate(CYCLE_TICKS);
-	else
-		player.stopAnimation();
 }
 
 function resize_canvas() {
@@ -297,6 +318,7 @@ function ld42_init() {
 	jumpSfx = Assets.addSfx("../sfx/jump.wav");
 	landSfx = Assets.addSfx("../sfx/ground.wav");
 	ouchSfx = Assets.addSfx("../sfx/hit-head.wav");
+	spikesSfx = Assets.addSfx("../sfx/spikes.wav");
 	
 	let loaded = false;
 	let oldTicks = getTicks();
