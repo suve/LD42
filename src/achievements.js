@@ -37,7 +37,8 @@ function __achievements() {
 	};
 	
 	this.render = function() {
-		const AchievSize = 16;
+		const AchievSize = 24;
+		const HalfSize = AchievSize / 2;
 		
 		let minY = 0;
 		let maxY = canvas.height - AchievSize - Math.floor((canvas.height % AchievSize)/2);
@@ -50,7 +51,7 @@ function __achievements() {
 		
 		let count = this.stack.length;
 		for(let idx = 0; idx < count; ++idx) {
-			fillCircle(x + 8, y + 8, 8, 'yellow');
+			fillCircle(x + HalfSize, y + HalfSize, HalfSize, 'yellow');
 			
 			if(dir === 'r') {
 				x += AchievSize;
