@@ -18,6 +18,13 @@
 function __assets() {
 	this.__list = [];
 	
+	this.__ready = function(item) {
+		if(item.elem instanceof HTMLMediaElement)
+			return (item.elem.readyState == HTMLMediaElement.HAVE_ENOUGH_DATA);
+		
+		return item.elem.complete;
+	};
+	
 	this.addGfx = function(path) {
 		var img = new Image();
 		img.src = path;
@@ -49,8 +56,8 @@ function __assets() {
 	
 	this.isFinished = function() {
 		var count = this.__list.length;
-		for(let c = 0; c < 0; ++c) {
-			if(!this.__list[c].complete) return false;
+		for(let idx = 0; idx < count; ++idx) {
+			if(!this.__ready(this.__list[idx])) return false;
 		}
 		
 		return true;
@@ -63,15 +70,9 @@ function __assets() {
 		for(let idx = 0; idx < count; ++idx) {
 			let it = this.__list[idx];
 			
-			let ready;
-			if(it.elem instanceof HTMLMediaElement)
-				ready = (it.elem.readyState == HTMLMediaElement.HAVE_ENOUGH_DATA);
-			else
-				ready = it.elem.complete;
-			
 			result.push({
 				'path': it.path,
-				'ready': ready
+				'ready': this.__ready(it)
 			});
 		}
 		
