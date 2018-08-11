@@ -23,12 +23,13 @@ const CYCLES_PER_SECOND = 50;
 const CYCLE_SECONDS = 1 / CYCLES_PER_SECOND;
 const CYCLE_TICKS = Math.floor(TICKS_PER_SECOND / CYCLES_PER_SECOND);
 
-const PLAYER_SPEED = 96;
-const GRAVITY = 88;
+const PLAYER_ACCEL = 360;
+const PLAYER_MAX_SPEED = 96;
 const PLAYER_JUMP_FORCE = 84;
+const GRAVITY = 88;
 const LAND_SFX_THRESHOLD = GRAVITY / 2;
 const OUCH_SFX_THRESHOLD = -PLAYER_JUMP_FORCE / 2;
-const AIR_CONTROL = 1;
+const AIR_CONTROL = 0.33;
 
 // Ugh
 const ARROW_LEFT = 37;
@@ -161,65 +162,84 @@ function overlap(x1, y1, w1, h1, x2, y2, w2, h2) {
 }
 
 function gameLogic() {
-	if((keystate[ARROW_UP]) && (player.velocity === null)) {
-		player.velocity = -PLAYER_JUMP_FORCE;
+	if((keystate[ARROW_UP]) && (player.yVel === null)) {
+		player.yVel = -PLAYER_JUMP_FORCE;
 		Sfx.play(jumpSfx);
 		Achievements.add(ACHIEV_JUMP);
 	}
 	
 	let airFactor = 1;
-	if(player.velocity !== null) {
-		player.velocity += GRAVITY * CYCLE_SECONDS;
-		player.y += player.velocity * CYCLE_SECONDS;
+	if(player.yVel !== null) {
+		player.yVel += GRAVITY * CYCLE_SECONDS;
+		player.y += player.yVel * CYCLE_SECONDS;
 		
-		if(player.velocity < 0) {
+		if(player.yVel < 0) {
 			if(map.collides(player.x, player.y-player.h) || map.collides(player.x + player.w - 1, player.y-player.h)) {
 				if(player.y-player.h < 0) {
 					Achievements.add(ACHIEV_SKY);
-				} else if(player.velocity <= OUCH_SFX_THRESHOLD) {
+				} else if(player.yVel <= OUCH_SFX_THRESHOLD) {
 					Sfx.play(ouchSfx);
 					Achievements.add(ACHIEV_OUCH);
 				}
 				
 				player.y = (Math.floor(player.y / 8)+1)*8;
-				player.velocity = 0;
+				player.yVel = 0;
 			}
 		} else {
 			if(map.collides(player.x, player.y) || map.collides(player.x + player.w - 1, player.y)) {
-				if(player.velocity >= LAND_SFX_THRESHOLD) {
+				if(player.yVel >= LAND_SFX_THRESHOLD) {
 					Sfx.play(landSfx);
 					Achievements.add(ACHIEV_LAND);
 				}
 				
 				player.y = Math.floor(player.y / 8)*8;
-				player.velocity = null;
+				player.yVel = null;
 			}
 		}
 		
 		airFactor = AIR_CONTROL;
 	}
 	
-	let moved = false;
+	let oldX = player.x;
+	let anyKey = false;
 	if(keystate[ARROW_LEFT]) {
 		player.facing = FACING_LEFT;
-		moved = true;
+		anyKey = true;
 		
-		let oldX = player.x;
-		player.x -= PLAYER_SPEED * CYCLE_SECONDS * airFactor;
-		if(map.collides(player.x, player.y-1) || map.collides(player.x, player.y-player.h)) player.x = oldX;
+		player.xVel -= PLAYER_ACCEL * CYCLE_SECONDS * airFactor;
+		if(player.xVel < -PLAYER_MAX_SPEED) player.xVel = -PLAYER_MAX_SPEED;
 	}
 	if(keystate[ARROW_RIGHT]) {
 		player.facing = FACING_RIGHT;
-		moved = true;
+		anyKey = true;
 		
-		let oldX = player.x;
-		player.x += PLAYER_SPEED * CYCLE_SECONDS * airFactor;
-		if(map.collides(player.x+player.w-1, player.y-1) || map.collides(player.x+player.w-1, player.y-player.h)) player.x = oldX;
+		player.xVel += PLAYER_ACCEL * CYCLE_SECONDS * airFactor;
+		if(player.xVel > PLAYER_MAX_SPEED) player.xVel = PLAYER_MAX_SPEED;
+	}
+	if(!anyKey) {
+		if(player.facing == FACING_RIGHT) {
+			player.xVel -= PLAYER_ACCEL * CYCLE_SECONDS;
+			if(player.xVel < 0) player.xVel = 0;
+		} else {
+			player.xVel += PLAYER_ACCEL * CYCLE_SECONDS;
+			if(player.xVel > 0) player.xVel = 0;
+		}
 	}
 	
-	if(moved && (player.velocity === null)) {
+	if(player.xVel !== 0) {
+		player.x += player.xVel * CYCLE_SECONDS;
+		if(
+			map.collides(player.x, player.y-1) || map.collides(player.x, player.y-player.h) ||
+			map.collides(player.x+player.w-1, player.y-1) || map.collides(player.x+player.w-1, player.y-player.h)
+		) {
+			player.x = oldX;
+			player.xVel = 0;
+		}
+	}
+	
+	if(player.yVel === null) {
 		if(!(map.collides(player.x, player.y) || map.collides(player.x + player.w - 1, player.y))) {
-			player.velocity = 0;
+			player.yVel = 0;
 		}
 	}
 	
@@ -229,7 +249,6 @@ function gameLogic() {
 	coins.collect(player.x, player.y-player.h);
 	coins.collect(player.x+player.w-1, player.y-player.h);
 	
-	let anyKey = keystate[ARROW_LEFT] || keystate[ARROW_RIGHT];
 	if(anyKey)
 		player.animate(CYCLE_TICKS);
 	else

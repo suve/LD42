@@ -27,7 +27,8 @@ function Player(x, y) {
 	this.w = 8;
 	this.h = 8;
 	this.facing = FACING_RIGHT;
-	this.velocity = null;
+	this.xVel = 0;
+	this.yVel = null;
 	
 	this.animate = function(dt) {
 		this.animationTicks += dt;
@@ -60,11 +61,11 @@ function Player(x, y) {
 	};
 	
 	this.falling = function() {
-		return this.velocity > 0;
+		return this.yVel > 0;
 	};
 	
 	this.jumping = function() {
-		return this.velocity < 0;
+		return this.yVel < 0;
 	};
 	
 	this.stopAnimation();
