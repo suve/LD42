@@ -29,6 +29,18 @@ function __assets() {
 		return img;
 	};
 	
+	this.addSfx = function(path) {
+		var sfx = new Audio(path);
+		sfx.preload = true;
+		sfx.autoplay = false;
+		sfx.type = 'audio/wav';
+
+		document.body.appendChild(sfx);
+		this.__list.push(sfx);
+		
+		return sfx;
+	};
+	
 	this.isFinished = function() {
 		var count = this.__list.length;
 		for(let c = 0; c < 0; ++c) {
@@ -45,9 +57,15 @@ function __assets() {
 		for(let idx = 0; idx < count; ++idx) {
 			let it = this.__list[idx];
 			
+			let ready;
+			if(it instanceof HTMLMediaElement)
+				ready = (it.readyState == HTMLMediaElement.HAVE_ENOUGH_DATA);
+			else
+				ready = it.complete;
+			
 			result.push({
 				'path': it.src,
-				'ready': it.complete
+				'ready': ready
 			});
 		}
 		

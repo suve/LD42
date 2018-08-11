@@ -43,6 +43,7 @@ var player;
 var pipe;
 
 var playerGfx;
+var jumpSfx, landSfx;
 
 function getTicks() {
 	var d = new Date();
@@ -89,7 +90,7 @@ function printText(x, y, text, size, colour) {
 
 function drawFrame() {
 	fillRect(0, 0, null, null, 'black');
-	fillRect(pipe.x, pipe.y - pipe.h, pipe.w, pipe.h, 'red');
+	// fillRect(pipe.x, pipe.y - pipe.h, pipe.w, pipe.h, 'red');
 	fillRect(0, GROUND_Y, null, null, 'green');
 	
 	let frame = player.frame;
@@ -152,6 +153,7 @@ function overlap(x1, y1, w1, h1, x2, y2, w2, h2) {
 function gameLogic() {
 	if((keystate[ARROW_UP]) && (player.velocity === null)) {
 		player.velocity = -PLAYER_JUMP_FORCE;
+		jumpSfx.play();
 	}
 	
 	let airFactor = 1;
@@ -162,10 +164,14 @@ function gameLogic() {
 		if(player.y >= GROUND_Y) {
 			player.y = GROUND_Y;
 			player.velocity = null;
-		} else if(overlap(player, pipe)) {
+			landSfx.play();
+		}
+		/*
+		else if(overlap(player, pipe)) {
 			player.y = pipe.y - pipe.h;
 			player.velocity = null;
 		}
+		*/
 		
 		airFactor = AIR_CONTROL;
 	}
@@ -175,14 +181,16 @@ function gameLogic() {
 		
 		let oldX = player.x;
 		player.x -= PLAYER_SPEED * CYCLE_SECONDS * airFactor;
-		if(player.x < 0 || overlap(player, pipe)) player.x = oldX;
+		//if(player.x < 0 || overlap(player, pipe)) player.x = oldX;
+		if(player.x < 0) player.x = oldX;
 	}
 	if(keystate[ARROW_RIGHT]) {
 		player.facing = FACING_RIGHT;
 		
 		let oldX = player.x;
 		player.x += PLAYER_SPEED * CYCLE_SECONDS * airFactor;
-		if(player.x >= canvas.width || overlap(player, pipe)) player.x = oldX;
+		//if(player.x >= canvas.width || overlap(player, pipe)) player.x = oldX;
+		if(player.x >= canvas.width) player.x = oldX;
 	}
 	
 	let anyKey = keystate[ARROW_LEFT] || keystate[ARROW_RIGHT];
@@ -218,6 +226,8 @@ function ld42_init() {
 	
 	player = new Player(canvas.width / 4, GROUND_Y);
 	playerGfx = Assets.addGfx("../gfx/hero-8px.png");
+	jumpSfx = Assets.addSfx("../sfx/jump.wav");
+	landSfx = Assets.addSfx("../sfx/ground.wav");
 	
 	pipe = {
 		'x': (1.0 + Math.random()) * (canvas.width / 3),

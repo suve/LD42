@@ -17,10 +17,13 @@
 GRAPHICS_DEVEL := $(shell ls gfx/*.png)
 GRAPHICS_BUILD := $(GRAPHICS_DEVEL:gfx/%.png=build/%.png)
 
+SOUNDS_DEVEL := $(shell ls sfx/*.wav)
+SOUNDS_BUILD := $(SOUNDS_DEVEL:sfx/%.wav=build/%.wav)
+
 SOURCES_DEVEL := $(shell ls src/*.js)
 SOURCES_BUILD := $(SOURCES_DEVEL:src/%.js=build/%.js)
 
-all: build/index.html build/style.css $(SOURCES_BUILD) $(GRAPHICS_BUILD)
+all: build/index.html build/style.css $(SOURCES_BUILD) $(GRAPHICS_BUILD) $(SOUNDS_BUILD)
 
 build/%.html: src/%.html
 	mkdir -p build
@@ -32,13 +35,17 @@ build/%.css: src/%.css
 
 build/%.js: src/%.js
 	mkdir -p build
-	cat "$<" | sed -e 's|"\.\./gfx/\([a-zA-Z0-9._\-]*\)"|"\1"|g' > "$@"
+	cat "$<" | sed -e 's|"\.\./gfx/\([a-zA-Z0-9._\-]*\)"|"\1"|g' -e 's|"\.\./sfx/\([a-zA-Z0-9._\-]*\)"|"\1"|g' > "$@"
 
 build/%.png: gfx/%.png
 	mkdir -p build
-	convert "$<" -transparent '#209C00' "$@.transparent.png"
+	convert "$<" -transparent '#209C00' -transparent '#FF678B' "$@.transparent.png"
 	pngcrush "$@.transparent.png" "$@" >/dev/null 2>/dev/null
 	rm "$@.transparent.png"
+
+build/%.wav: sfx/%.wav
+	mkdir -p build
+	cp "$<" "$@"
 
 clean:
 	rm -rf build/
