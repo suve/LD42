@@ -25,7 +25,7 @@ function Coins(map) {
 	
 	for(let y = 0; y < map.h; ++y) {
 		for(let x = 0; x < map.w; ++x) {
-			if(map.data[y][x] == -1) {
+			if(map.data[y][x] == TILE_COIN) {
 				this.__list.push({'x': x, 'y': y, 'dead': null});
 			}
 		}
@@ -38,7 +38,7 @@ function Coins(map) {
 		if((x < 0) || (y < 0)) return;
 		if((x >= this.__map.w) || (y >= this.__map.h)) return;
 		
-		if(this.__map.data[y][x] !== -1) return;
+		if(this.__map.data[y][x] !== TILE_COIN) return;
 		this.__map.data[y][x] = 0;
 		
 		let count = this.__list.length;

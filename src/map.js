@@ -15,6 +15,9 @@
  * along with this program (LICENCE.txt). 
  * If not, see <http://www.gnu.org/licenses/>.
  */
+const TILE_SPIKES = 3;
+const TILE_COIN = -1;
+
 function Map(data) {
 	this.data = data;
 	this.h = data.length;
@@ -91,13 +94,13 @@ function Map(data) {
 		this.ctx2d = this.canvas.getContext('2d', { 'alpha': false });
 	};
 	
-	this.__render = function() {
+	this.__render = function(sticky) {
 		this.__allocCanvas();
 		
 		this.ctx2d.fillStyle = '#00c0ff';
 		this.ctx2d.fillRect(0, 0, this.canvas.width, this.canvas.height);
 		
-		this.__calculateQuarts();
+		this.__calculateQuarts(sticky);
 		for(let y = 0; y < this.h; ++y) {
 			for(let x = 0; x < this.w; ++x) {
 				let type = this.data[y][x];
@@ -119,7 +122,7 @@ function Map(data) {
 	}
 	
 	this.draw = function() {
-		if(this.canvas === null) this.__render();
+		if(this.canvas === null) this.__render(true);
 		
 		ctx.drawImage(this.canvas, 0, 0);
 	}

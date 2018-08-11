@@ -17,6 +17,13 @@
  * along with this program (LICENCE.txt). 
  * If not, see <http://www.gnu.org/licenses/>.
  */
+const TILE_EMPTY = 0;
+const TILE_GRASS = 1;
+const TILE_WALL = 2;
+const TILE_SPIKES = 3;
+
+const TILE_COIN = -1;
+
 
 function int_to_rgb(int $int) {
 	$b = $int & 0xFF;
@@ -65,31 +72,34 @@ function rgb_to_hex($rgb) {
 function hex_to_tile($hex) {
 	switch($hex) {
 		case '00C0FF':
-			return 0;
+			return TILE_EMPTY;
 		
 		case '00C000':
-			return 1;
+			return TILE_GRASS;
 		
 		case '7F7F7F':
-			return 2;
+			return TILE_WALL;
+		
+		case 'FF8080':
+			return TILE_SPIKES;
 		
 		case 'FFFF00':
-			return -1;
+			return TILE_COIN;
 		
 		default:
-			echo "What the fuck is \"$hex\"?\n";
+			fprintf(stderr, "What the fuck is \"$hex\"?\n");
 			exit(1);
 	}
 }
 
 if($argc < 2) {
-	echo "You must provide a FILE to be processed\n";
+	fprintf(stderr, "You must provide a FILE to be processed\n");
 	exit(1);
 }
 
 $img = imagecreatefrompng($argv[1]);
 if($img === FALSE) {
-	echo "Failed to open \"" . $argv[1] . "\"\n";
+	fprintf(stderr, "Failed to open \"" . $argv[1] . "\"\n");
 	exit(1);
 }
 

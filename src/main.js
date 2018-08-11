@@ -275,6 +275,12 @@ function resize_canvas() {
 	canvas.style.margin = Math.floor((wndH - newH) / 2) + 'px auto';
 }
 
+function resetLevel() {
+	map = new Map(mapdata);
+	coins = new Coins(map);
+	player = new Player(0, canvas.height-16);
+}
+
 function ld42_init() {
 	appstart = (new Date()).getTime();
 	
@@ -313,9 +319,7 @@ function ld42_init() {
 	window.onresize = resize_canvas;
 	resize_canvas();
 	
-	map = new Map(mapdata);
-	coins = new Coins(map);
-	player = new Player(0, canvas.height-16);
+	resetLevel();
 	Achievements.reset();
 	
 	document.onkeydown = handleKeyDown;
