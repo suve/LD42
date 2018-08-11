@@ -24,7 +24,10 @@ const FACING_RIGHT = 0;
 function Player(x, y) {
 	this.x = x;
 	this.y = y;
+	this.w = 8;
+	this.h = 8;
 	this.facing = FACING_RIGHT;
+	this.velocity = null;
 	
 	this.animate = function(dt) {
 		this.animationTicks += dt;
@@ -54,6 +57,14 @@ function Player(x, y) {
 		this.frame = this.calcFrameToFrame();
 		
 		this.animationTicks = 0;
+	};
+	
+	this.falling = function() {
+		return this.velocity > 0;
+	};
+	
+	this.jumping = function() {
+		return this.velocity < 0;
 	};
 	
 	this.stopAnimation();

@@ -23,8 +23,11 @@ const CYCLES_PER_SECOND = 50;
 const CYCLE_SECONDS = 1 / CYCLES_PER_SECOND;
 const CYCLE_TICKS = Math.floor(TICKS_PER_SECOND / CYCLES_PER_SECOND);
 
-const PLAYER_SPEED = 120;
-
+const PLAYER_SPEED = 96;
+const GRAVITY = 88;
+const PLAYER_JUMP_FORCE = 100;
+const GROUND_Y = 164;
+const AIR_CONTROL = 1;
 
 // Ugh
 const ARROW_LEFT = 37;
@@ -37,6 +40,7 @@ var appstart;
 var canvas, ctx;
 var keystate = [];
 var player;
+var pipe;
 
 var playerGfx;
 
@@ -85,7 +89,13 @@ function printText(x, y, text, size, colour) {
 
 function drawFrame() {
 	fillRect(0, 0, null, null, 'black');
-	ctx.drawImage(playerGfx, player.frame*8, player.facing*8, 8, 8, Math.floor(player.x), Math.floor(player.y), 8, 8);
+	fillRect(pipe.x, pipe.y - pipe.h, pipe.w, pipe.h, 'red');
+	fillRect(0, GROUND_Y, null, null, 'green');
+	
+	let frame = player.frame;
+	if(player.jumping()) frame = 3;
+	if(player.falling()) frame = 4;
+	ctx.drawImage(playerGfx, frame*8, player.facing*8, 8, 8, Math.floor(player.x), Math.floor(player.y)-8, 8, 8);
 	
 	let fps = countFPS();
 	printText(0, 0, fps+'FPS', 12, 'white');
@@ -122,27 +132,57 @@ function handleKeyUp(k) {
 	keystate[k] = false;
 }
 
-function gameLogic() {
-	if(keystate[ARROW_UP]) {
-		player.y -= PLAYER_SPEED * CYCLE_SECONDS;
-		if(player.y < 0) player.y = 0;
+function overlap(x1, y1, w1, h1, x2, y2, w2, h2) {
+	if(typeof y1 === "object") {
+		h2 = y1.h;
+		w2 = y1.w;
+		y2 = y1.y;
+		x2 = y1.x;
 	}
-	if(keystate[ARROW_DOWN]) {
-		player.y += PLAYER_SPEED * CYCLE_SECONDS;
-		if(player.y >= canvas.height) player.y = canvas.height-1;
+	if(typeof x1 === "object") {
+		h1 = x1.h;
+		w1 = x1.w;
+		y1 = x1.y;
+		x1 = x1.x;
+	}
+	
+	return !( (x2 > x1+w1) || (x2+w2 < x1) || (y2-h2 > y1) || (y2 < y1-h1) );
+}
+
+function gameLogic() {
+	if((keystate[ARROW_UP]) && (player.velocity === null)) {
+		player.velocity = -PLAYER_JUMP_FORCE;
+	}
+	
+	let airFactor = 1;
+	if(player.velocity !== null) {
+		player.velocity += GRAVITY * CYCLE_SECONDS;
+		
+		player.y += player.velocity * CYCLE_SECONDS;
+		if(player.y >= GROUND_Y) {
+			player.y = GROUND_Y;
+			player.velocity = null;
+		} else if(overlap(player, pipe)) {
+			player.y = pipe.y - pipe.h;
+			player.velocity = null;
+		}
+		
+		airFactor = AIR_CONTROL;
 	}
 	
 	if(keystate[ARROW_LEFT]) {
 		player.facing = FACING_LEFT;
 		
-		player.x -= PLAYER_SPEED * CYCLE_SECONDS;
-		if(player.x < 0) player.x = 0;
+		let oldX = player.x;
+		player.x -= PLAYER_SPEED * CYCLE_SECONDS * airFactor;
+		if(player.x < 0 || overlap(player, pipe)) player.x = oldX;
 	}
 	if(keystate[ARROW_RIGHT]) {
 		player.facing = FACING_RIGHT;
 		
-		player.x += PLAYER_SPEED * CYCLE_SECONDS;
-		if(player.x >= canvas.width) player.x = canvas.width-1;
+		let oldX = player.x;
+		player.x += PLAYER_SPEED * CYCLE_SECONDS * airFactor;
+		if(player.x >= canvas.width || overlap(player, pipe)) player.x = oldX;
 	}
 	
 	let anyKey = keystate[ARROW_LEFT] || keystate[ARROW_RIGHT];
@@ -176,8 +216,15 @@ function ld42_init() {
 	canvas = document.getElementsByTagName('canvas')[0];
 	ctx = canvas.getContext('2d', { alpha: false });
 	
-	player = new Player(canvas.width / 2, canvas.height / 2);
+	player = new Player(canvas.width / 4, GROUND_Y);
 	playerGfx = Assets.addGfx("../gfx/hero-8px.png");
+	
+	pipe = {
+		'x': (1.0 + Math.random()) * (canvas.width / 3),
+		'y': GROUND_Y,
+		'w': (1.0 + Math.random()) * (canvas.width / 24),
+		'h': Math.floor((1.0 + Math.random()) * (GRAVITY / 3.0))
+	};
 	
 	let loaded = false;
 	let oldTicks = getTicks();
