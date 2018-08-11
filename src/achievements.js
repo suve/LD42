@@ -21,7 +21,7 @@ const ACHIEV_LAND = 2;
 const ACHIEV_OUCH = 3;
 const ACHIEV_SKY  = 4;
 
-const AchievementSteps = [1, 5, 10, 25, 50];
+const AchievementSteps = [1, 5, 10, 25, 50, 75, 100];
 
 function __achievements() {
 	this.reset = function() {
@@ -50,7 +50,7 @@ function __achievements() {
 		
 		let minY = 0;
 		let maxY = canvas.height - AchievSize - Math.floor((canvas.height % AchievSize)/2);
-		let minX = 0;
+		let minX = Math.floor((canvas.width % AchievSize)/2);
 		let maxX = canvas.width;
 		
 		let x = minX;
