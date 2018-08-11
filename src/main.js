@@ -27,6 +27,7 @@ const PLAYER_SPEED = 96;
 const GRAVITY = 88;
 const PLAYER_JUMP_FORCE = 84;
 const LAND_SFX_THRESHOLD = GRAVITY / 2;
+const OUCH_SFX_THRESHOLD = -PLAYER_JUMP_FORCE / 2;
 const AIR_CONTROL = 1;
 
 // Ugh
@@ -89,16 +90,8 @@ function printText(x, y, text, size, colour) {
 }
 
 function drawFrame() {
-	for(let y = 0; y < map.h; ++y) {
-		for(let x = 0; x < map.w; ++x) {
-			let type = map.data[y][x];
-			if(type) {
-				ctx.drawImage(worldGfx, 0, (type-1)*8, 8, 8, x*8, y*8, 8, 8);
-			} else {
-				fillRect(x*8, y*8, 8, 8, '#00c0ff');
-			}
-		}
-	}
+	fillRect(0, 0, null, null, '#00c0ff');
+	map.draw();
 	
 	let frame = player.frame;
 	if(player.jumping()) frame = 3;
@@ -170,7 +163,7 @@ function gameLogic() {
 		
 		if(player.velocity < 0) {
 			if(map.collides(player.x, player.y-player.h) || map.collides(player.x + player.w - 1, player.y-player.h)) {
-				ouchSfx.play();
+				if(player.velocity <= OUCH_SFX_THRESHOLD) ouchSfx.play();
 				player.y = (Math.floor(player.y / 8)+1)*8;
 				player.velocity = 0;
 			}

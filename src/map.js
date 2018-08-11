@@ -20,6 +20,69 @@ function Map(data) {
 	this.h = data.length;
 	this.w = data[0].length;
 	
+	this.__stickQuart = function(tile, neighbour, sticky) {
+		return sticky ? (neighbour > 0) : (neighbour == tile);
+	};
+	
+	this.__calculateQuarts = function(sticky) {
+		const ADJACENT_X = 1;
+		const ADJACENT_Y = 2;
+		const ADJACENT_CORNER = 4;
+		
+		this.quarts = []
+		for(let y = 0; y < this.h; ++y) {
+			this.quarts[y] = []
+		}
+		
+		for(let y = 0; y < this.h; ++y) {
+			for(let x = 0; x < this.w; ++x) {
+				// Reset
+				let quarts = {
+					'tl': 0,
+					'tr': 0,
+					'bl': 0,
+					'br': 0
+				};
+				
+				// Check above and below
+				if((y == 0) || this.__stickQuart(this.data[y][x], this.data[y-1][x], sticky)) {
+					quarts.tl += ADJACENT_Y; quarts.tr += ADJACENT_Y;
+				}
+				if((y >= this.h-1) || this.__stickQuart(this.data[y][x], this.data[y+1][x], sticky)) {
+					quarts.bl += ADJACENT_Y; quarts.br += ADJACENT_Y;
+				}
+				  
+				// Check left and right
+				if((x == 0) || this.__stickQuart(this.data[y][x], this.data[y][x-1], sticky)) {
+					quarts.tl += ADJACENT_X; quarts.bl += ADJACENT_X;
+				}
+				if((x >= this.w-1) || this.__stickQuart(this.data[y][x], this.data[y][x+1], sticky)) {
+					quarts.tr += ADJACENT_X; quarts.br += ADJACENT_X;
+				}
+				
+				// Check corners.
+				if((x == 0)        || (y == 0)        || this.__stickQuart(this.data[y][x], this.data[y-1][x-1], sticky)) quarts.tl += ADJACENT_CORNER;
+				if((x >= this.w-1) || (y == 0)        || this.__stickQuart(this.data[y][x], this.data[y-1][x+1], sticky)) quarts.tr += ADJACENT_CORNER;
+				if((x >= this.w-1) || (y >= this.h-1) || this.__stickQuart(this.data[y][x], this.data[y+1][x+1], sticky)) quarts.br += ADJACENT_CORNER;
+				if((x == 0)        || (y >= this.h-1) || this.__stickQuart(this.data[y][x], this.data[y+1][x-1], sticky)) quarts.bl += ADJACENT_CORNER;
+				
+				this.quarts[y][x] = quarts;
+			}
+		}
+	};
+	
+	this.__renderQuart = function(tile, dx, dy, qx, qy, mapped) {
+		ctx.drawImage(worldGfx, qx + mapped*8, qy + (tile-1)*8, 4, 4, dx+qx, dy+qy, 4, 4);
+	};
+	
+	this.__renderTile = function(tile, quarts, dx, dy) {
+		const QuartMap = [3,1,2,4,3,1,2,0];
+		this.__renderQuart(tile, dx, dy, 0, 0, QuartMap[quarts.tl]);
+		this.__renderQuart(tile, dx, dy, 4, 0, QuartMap[quarts.tr]);
+		this.__renderQuart(tile, dx, dy, 4, 4, QuartMap[quarts.br]);
+		this.__renderQuart(tile, dx, dy, 0, 4, QuartMap[quarts.bl]);
+	}
+	
 	this.collides = function(x, y) {
 		x = Math.floor(x / 8);
 		y = Math.floor(y / 8);
@@ -29,4 +92,17 @@ function Map(data) {
 		
 		return !!this.data[y][x];
 	}
+	
+	this.draw = function() {
+		for(let y = 0; y < this.h; ++y) {
+			for(let x = 0; x < this.w; ++x) {
+				let type = this.data[y][x];
+				if(type) {
+					this.__renderTile(type, this.quarts[y][x], x*8, y*8);
+				}
+			}
+		}
+	}
+	
+	this.__calculateQuarts();
 }
