@@ -291,7 +291,11 @@ function playtimeAchievementCheck() {
 		TICKS_PER_SECOND * 60 * 5,
 		TICKS_PER_SECOND * 60 * 10,
 		TICKS_PER_SECOND * 60 * 15,
+		TICKS_PER_SECOND * 60 * 20,
+		TICKS_PER_SECOND * 60 * 25,
 		TICKS_PER_SECOND * 60 * 30,
+		TICKS_PER_SECOND * 60 * 35,
+		TICKS_PER_SECOND * 60 * 40,
 	];
 	
 	if(__playtimeLevel >= PlaytimeThresholds.length) return;

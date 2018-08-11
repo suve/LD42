@@ -24,7 +24,7 @@ const ACHIEV_WALLHIT  = 5;
 const ACHIEV_SPIKES   = 6;
 const ACHIEV_PLAYTIME = 7;
 
-const AchievementSteps = [1, 5, 10, 25, 50, 75, 100];
+const AchievementSteps = [1, 5, 10, 25, 50, 75, 100, 200, 300, 400, 500];
 
 function __achievements() {
 	this.reset = function() {
