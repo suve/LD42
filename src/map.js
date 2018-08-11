@@ -101,7 +101,7 @@ function Map(data) {
 		for(let y = 0; y < this.h; ++y) {
 			for(let x = 0; x < this.w; ++x) {
 				let type = this.data[y][x];
-				if(type) this.__renderTile(type, this.quarts[y][x], x*8, y*8);
+				if(type > 0) this.__renderTile(type, this.quarts[y][x], x*8, y*8);
 			}
 		}
 		
@@ -115,7 +115,7 @@ function Map(data) {
 		if((x < 0) || (y < 0)) return true;
 		if((x >= this.w) || (y >= this.h)) return true;
 		
-		return !!this.data[y][x];
+		return this.data[y][x] > 0;
 	}
 	
 	this.draw = function() {

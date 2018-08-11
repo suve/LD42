@@ -40,11 +40,11 @@ const ARROW_DOWN = 40;
 var appstart;
 var canvas, ctx;
 var keystate = [];
-var map;
+var coins, map;
 var player;
 
-var playerGfx, worldGfx;
-var achievSfx, jumpSfx, landSfx, ouchSfx;
+var coinGfx, playerGfx, worldGfx;
+var achievSfx, coinSfx, jumpSfx, landSfx, ouchSfx;
 
 function getTicks() {
 	var d = new Date();
@@ -99,6 +99,7 @@ function printText(x, y, text, size, colour) {
 
 function drawFrame() {
 	map.draw();
+	coins.render();
 	
 	let frame = player.frame;
 	if(player.jumping()) frame = 3;
@@ -221,6 +222,10 @@ function gameLogic() {
 			player.velocity = 0;
 		}
 	}
+	coins.collect(player.x, player.y-1);
+	coins.collect(player.x+player.w-1, player.y-1);
+	coins.collect(player.x, player.y-player.h);
+	coins.collect(player.x+player.w-1, player.y-player.h);
 	
 	let anyKey = keystate[ARROW_LEFT] || keystate[ARROW_RIGHT];
 	if(anyKey)
@@ -255,8 +260,10 @@ function ld42_init() {
 	
 	playerGfx = Assets.addGfx("../gfx/hero-8px.png");
 	worldGfx = Assets.addGfx("../gfx/world-8px.png");
+	coinGfx = Assets.addGfx("../gfx/coin-8px.png");
 	
 	achievSfx = Assets.addSfx("../sfx/achiev.wav");
+	coinSfx = Assets.addSfx("../sfx/coin.wav");
 	jumpSfx = Assets.addSfx("../sfx/jump.wav");
 	landSfx = Assets.addSfx("../sfx/ground.wav");
 	ouchSfx = Assets.addSfx("../sfx/hit-head.wav");
@@ -283,6 +290,7 @@ function ld42_init() {
 	resize_canvas();
 	
 	map = new Map(mapdata);
+	coins = new Coins(map);
 	player = new Player(0, canvas.height-16);
 	Achievements.reset();
 	

@@ -28,7 +28,7 @@ function __achievements() {
 	
 	this.add = function(achiev) {
 		if(!this.list[achiev]) {
-			this.list[achiev] = 0; // 1;
+			this.list[achiev] = 1;
 			this.stack.push(achiev);
 			Sfx.play(achievSfx);
 		} else {

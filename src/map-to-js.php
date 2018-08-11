@@ -73,6 +73,9 @@ function hex_to_tile($hex) {
 		case '7F7F7F':
 			return 2;
 		
+		case 'FFFF00':
+			return -1;
+		
 		default:
 			echo "What the fuck is \"$hex\"?\n";
 			exit(1);
