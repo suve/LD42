@@ -15,11 +15,12 @@
  * along with this program (LICENCE.txt). 
  * If not, see <http://www.gnu.org/licenses/>.
  */
-const ACHIEV_JUMP = 0;
-const ACHIEV_COIN = 1;
-const ACHIEV_LAND = 2;
-const ACHIEV_OUCH = 3;
-const ACHIEV_SKY  = 4;
+const ACHIEV_JUMP    = 0;
+const ACHIEV_COIN    = 1;
+const ACHIEV_LAND    = 2;
+const ACHIEV_OUCH    = 3;
+const ACHIEV_SKY     = 4;
+const ACHIEV_WALLHIT = 5;
 
 const AchievementSteps = [1, 5, 10, 25, 50, 75, 100];
 

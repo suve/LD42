@@ -232,6 +232,8 @@ function gameLogic() {
 			map.collides(player.x, player.y-1) || map.collides(player.x, player.y-player.h) ||
 			map.collides(player.x+player.w-1, player.y-1) || map.collides(player.x+player.w-1, player.y-player.h)
 		) {
+			if(Math.abs(player.xVel) >= PLAYER_MAX_SPEED*0.99) Achievements.add(ACHIEV_WALLHIT);
+			
 			player.x = oldX;
 			player.xVel = 0;
 		}
