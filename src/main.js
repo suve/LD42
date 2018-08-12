@@ -61,6 +61,7 @@ var worldGfx = [];
 var achievGfx;
 
 var achievSfx, jumpSfx, landSfx, spikesSfx, ouchHeadSfx, ouchWallSfx;
+var walkerAttackSfx, walkerDeathSfx;
 var coinSfx, oneUpSfx, oneDownSfx;
 
 
@@ -323,6 +324,7 @@ function calculateEnemies() {
 		calculateWalkerMovement(enemies[idx]);
 		
 		if(player.yVel > 0 && overlap(player, enemies[idx])) {
+			Sfx.play(walkerDeathSfx);
 			enemies.splice(idx, 1);
 			--count;
 		} else {
@@ -437,6 +439,7 @@ function checkPlayerDamage() {
 	let count = enemies.length;
 	for(let idx = 0; idx < count; ++idx) {
 		if(overlap(player, enemies[idx])) {
+			if(player.health <= 1) Sfx.play(walkerAttackSfx);
 			return true;
 		}
 	}
@@ -592,6 +595,8 @@ function ld42_init() {
 	ouchHeadSfx = Assets.addSfx("../sfx/hit-head.wav");
 	ouchWallSfx = Assets.addSfx("../sfx/hit-wall.wav");
 	spikesSfx = Assets.addSfx("../sfx/spikes.wav");
+	walkerAttackSfx = Assets.addSfx("../sfx/walker-attack.wav");
+	walkerDeathSfx = Assets.addSfx("../sfx/walker-death.wav");
 	
 	let loaded = false;
 	let inGame = false;
