@@ -48,7 +48,8 @@ var coins, map;
 var player;
 
 var logoGfx = [];
-var achievGfx, coinGfx, playerGfx, worldGfx;
+var coinGfx = [], playerGfx = [], worldGfx = [];
+var achievGfx;
 var achievSfx, coinSfx, jumpSfx, landSfx, spikesSfx, ouchHeadSfx, ouchWallSfx;
 
 
@@ -125,7 +126,7 @@ function drawFrame() {
 	let frame = player.frame;
 	if(player.jumping()) frame = 3;
 	if(player.falling()) frame = 4;
-	ctx.drawImage(playerGfx, frame*8, player.facing*8, 8, 8, Math.floor(player.x*scale), Math.floor((player.y-1)*scale), scale, scale);
+	ctx.drawImage(playerGfx[scale], frame*scale, player.facing*scale, scale, scale, Math.floor(player.x*scale), Math.floor((player.y-1)*scale), scale, scale);
 	
 	ctx.restore(); ctx.save();
 	Achievements.render();
@@ -436,9 +437,14 @@ function ld42_init() {
 	logoGfx[3] = Assets.addGfx("../gfx/logo-deluxe.png");
 	
 	achievGfx = Assets.addGfx("../gfx/achievements.png");
-	playerGfx = Assets.addGfx("../gfx/hero-8px.png");
-	worldGfx = Assets.addGfx("../gfx/world-8px.png");
-	coinGfx = Assets.addGfx("../gfx/coin-8px.png");
+	
+	const GfxSizes = [8, 12];
+	for(let idx = 0; idx < GfxSizes.length; ++idx) {
+		let s = GfxSizes[idx];
+		playerGfx[s] = Assets.addGfx("../gfx/hero-"+s+"px.png");
+		worldGfx[s] = Assets.addGfx("../gfx/world-"+s+"px.png");
+		coinGfx[s] = Assets.addGfx("../gfx/coin-"+s+"px.png");
+	}
 	
 	achievSfx = Assets.addSfx("../sfx/achiev.wav");
 	coinSfx = Assets.addSfx("../sfx/coin.wav");

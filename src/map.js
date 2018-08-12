@@ -85,7 +85,8 @@ function Map(data) {
 	};
 	
 	this.__renderQuart = function(tile, dx, dy, qx, qy, mapped) {
-		this.ctx2d.drawImage(worldGfx, qx*8 + mapped*8, qy*8 + (tile-1)*8, 4, 4, dx+qx*this.canvasScale, dy+qy*this.canvasScale, this.canvasScale/2, this.canvasScale/2);
+		let sc = this.canvasScale;
+		this.ctx2d.drawImage(worldGfx[sc], (qx+mapped)*sc, (qy+tile-1)*sc, sc/2, sc/2, dx+qx*sc, dy+qy*sc, sc/2, sc/2);
 	};
 	
 	this.__renderTile = function(tile, quarts, dx, dy) {

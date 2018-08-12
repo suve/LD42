@@ -39,7 +39,7 @@ build/mapdata.js: map/test.png src/map-to-js.php
 
 build/%.js: src/%.js
 	mkdir -p build
-	cat "$<" | sed -e 's|"\.\./gfx/\([a-zA-Z0-9._\-]*\)"|"\1"|g' -e 's|"\.\./sfx/\([a-zA-Z0-9._\-]*\)"|"\1"|g' > "$@"
+	cat "$<" | sed -e 's|"\.\./gfx/\([a-zA-Z0-9._+"\-]*\)");|"\1");|g' -e 's|"\.\./sfx/\([a-zA-Z0-9._\-]*\)"|"\1"|g' > "$@"
 
 build/%.png: gfx/%.png
 	mkdir -p build

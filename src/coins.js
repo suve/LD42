@@ -82,10 +82,10 @@ function Coins(map) {
 		for(let idx = 0; idx < count; ++idx) {
 			let e = this.__list[idx];
 			if(e.dead === null) {
-				ctx.drawImage(coinGfx, liveFrame*8, 0, 8, 8, e.x*scale, e.y*scale, scale, scale);
+				ctx.drawImage(coinGfx[scale], liveFrame*scale, 0, scale, scale, e.x*scale, e.y*scale, scale, scale);
 			} else {
 				let deadFrame = Math.floor(e.dead / (COIN_ANIM_TICKS / 2));
-				ctx.drawImage(coinGfx, deadFrame*8, 8, 8, 8, e.x*scale, e.y*scale, scale, scale);
+				ctx.drawImage(coinGfx[scale], deadFrame*scale, scale, scale, scale, e.x*scale, e.y*scale, scale, scale);
 			}
 		}
 	};

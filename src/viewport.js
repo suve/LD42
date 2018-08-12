@@ -15,18 +15,25 @@
  * along with this program (LICENCE.txt). 
  * If not, see <http://www.gnu.org/licenses/>.
  */
+const GfxSizes = [8, 12];
+
 function Viewport() {
 	this.getScale = function() {
 		return this.__scale;
 	};
 	
 	this.setScale = function(newScale) {
-		if(newScale % 2) return;
-		if(newScale < 8 || newScale > 16) return;
-		
-		this.__scale = newScale;
-		this.w = canvas.width / this.__scale;
-		this.h = canvas.height / this.__scale;
+		let found = false;
+		for(let idx = 0; idx < GfxSizes.length; ++idx) {
+			if(GfxSizes[idx] === newScale) {
+				this.__scale = newScale;
+				this.w = canvas.width / this.__scale;
+				this.h = canvas.height / this.__scale;
+				
+				break;
+			}
+		}
+		return this.__scale;
 	};
 	
 	this.update = function(player) {
