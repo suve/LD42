@@ -29,6 +29,8 @@ function Player(x, y) {
 	this.facing = FACING_RIGHT;
 	this.xVel = 0;
 	this.yVel = null;
+	this.health = 1;
+	this.invul = 0;
 	this.dead = null;
 	
 	this.animate = function(dt) {

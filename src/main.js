@@ -31,6 +31,9 @@ const LAND_SFX_THRESHOLD = GRAVITY * 0.75;
 const OUCH_SFX_THRESHOLD = -PLAYER_JUMP_FORCE / 2;
 const AIR_CONTROL = 0.33;
 
+const INVUL_CYCLES = Math.floor(CYCLES_PER_SECOND * 2.25);
+const INVUL_BLINK_CYCLES = CYCLES_PER_SECOND / 10;
+
 const DEATH_TIME = 0.48;
 const DEATH_ANIM_TIME = DEATH_TIME * 0.9;
 
@@ -51,7 +54,7 @@ var logoGfx = [];
 var coinGfx = [], potionGfx = [], playerGfx = [], worldGfx = [];
 var achievGfx;
 var achievSfx, jumpSfx, landSfx, spikesSfx, ouchHeadSfx, ouchWallSfx;
-var coinSfx, oneUpSfx;
+var coinSfx, oneUpSfx, oneDownSfx;
 
 
 function getTicks() {
@@ -115,6 +118,20 @@ function printTextCentered(x, y, text, size, colour) {
 	ctx.fillText(text, x, y);
 }
 
+function drawPlayer() {
+	if(player.invul > 0) {
+		let phase = Math.floor(player.invul / INVUL_BLINK_CYCLES);
+		if(phase % 2 == 0) return;
+	}
+	
+	let scale = viewport.getScale();
+	
+	let frame = player.frame;
+	if(player.jumping()) frame = 3;
+	if(player.falling()) frame = 4;
+	ctx.drawImage(playerGfx[scale], frame*scale, player.facing*scale, scale, scale, Math.floor(player.x*scale), Math.floor((player.y-1)*scale), scale, scale);
+}
+
 function drawFrame() {
 	let scale = viewport.getScale();
 	viewport.update(player);
@@ -123,11 +140,7 @@ function drawFrame() {
 	
 	map.draw();
 	items.render();
-	
-	let frame = player.frame;
-	if(player.jumping()) frame = 3;
-	if(player.falling()) frame = 4;
-	ctx.drawImage(playerGfx[scale], frame*scale, player.facing*scale, scale, scale, Math.floor(player.x*scale), Math.floor((player.y-1)*scale), scale, scale);
+	drawPlayer();
 	
 	ctx.restore(); ctx.save();
 	Achievements.render();
@@ -338,13 +351,13 @@ function calculatePlayerMovement() {
 		player.stopAnimation();
 }
 
-function checkPlayerDeath() {
+function checkPlayerDamage() {
 	if(
 		map.deadly(player.x, player.y-0.05) || map.deadly(player.x, player.y-player.h) ||
 		map.deadly(player.x+player.w, player.y-0.05) || map.deadly(player.x+player.w, player.y-player.h)
 	) {
+		if(player.health <= 1) Sfx.play(spikesSfx);
 		Achievements.add(ACHIEV_SPIKES);
-		Sfx.play(spikesSfx);
 		return true;
 	}
 	
@@ -388,9 +401,20 @@ function gameLogic() {
 	}
 	
 	calculatePlayerMovement();
-	if(checkPlayerDeath()) {
-		player.dead = 0;
-		return;
+	if(player.invul <= 0) {
+		if(checkPlayerDamage()) {
+			player.health -= 1;
+			if(player.health <= 0) {
+				player.dead = 0;
+				return;
+			} 
+			
+			player.invul = INVUL_CYCLES;
+			viewport.setScale(viewport.getScale() - 4);
+			Sfx.play(oneDownSfx);
+		}
+	} else {
+		player.invul--;
 	}
 	
 	items.decay(CYCLE_TICKS);
@@ -452,6 +476,7 @@ function ld42_init() {
 	achievSfx = Assets.addSfx("../sfx/achiev.wav");
 	coinSfx = Assets.addSfx("../sfx/coin.wav");
 	oneUpSfx = Assets.addSfx("../sfx/1up.wav");
+	oneDownSfx = Assets.addSfx("../sfx/1down.wav");
 	jumpSfx = Assets.addSfx("../sfx/jump.wav");
 	landSfx = Assets.addSfx("../sfx/ground.wav");
 	ouchHeadSfx = Assets.addSfx("../sfx/hit-head.wav");

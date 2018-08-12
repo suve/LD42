@@ -42,6 +42,7 @@ function Items(map) {
 			Achievements.add(ACHIEV_COIN);
 			Sfx.play(coinSfx);
 		} else {
+			player.health += 1;
 			viewport.setScale(viewport.getScale() + 4);
 			Sfx.play(oneUpSfx);
 		}
