@@ -107,19 +107,19 @@ function hex_to_tile($hex) {
 			return TILE_JUMPER_L;
 		
 		default:
-			fprintf(stderr, "What the fuck is \"$hex\"?\n");
+			fprintf(STDERR, "What the fuck is \"$hex\"?\n");
 			exit(1);
 	}
 }
 
 if($argc < 2) {
-	fprintf(stderr, "You must provide a FILE to be processed\n");
+	fprintf(STDERR, "You must provide a FILE to be processed\n");
 	exit(1);
 }
 
 $img = imagecreatefrompng($argv[1]);
 if($img === FALSE) {
-	fprintf(stderr, "Failed to open \"" . $argv[1] . "\"\n");
+	fprintf(STDERR, "Failed to open \"" . $argv[1] . "\"\n");
 	exit(1);
 }
 
@@ -135,7 +135,14 @@ for($y = 0; $y < $h; ++$y) {
 	}
 }
 
-echo "var mapdata = [\n";
+
+$varname = basename($argv[1]);
+$varname = preg_replace('/\..*$/', '', $varname);
+$varname = preg_replace('/[^a-zA-Z0-9_]/', '_', $varname);
+$varname = preg_replace('/^[^a-zA-Z_]*/', '', $varname);
+$varname .= '_mapdata';
+
+echo "var $varname = [\n";
 for($y = 0; $y < $h; ++$y) {
 	echo "\t[" . implode(', ', $pixels[$y]) . "],\n";
 }

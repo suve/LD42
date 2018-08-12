@@ -714,7 +714,7 @@ function spawnEnemies(map) {
 function resetLevel() {
 	viewport.setScale(8);
 	
-	map = new Map(mapdata);
+	map = new Map(test_mapdata);
 	spawnEnemies(map);
 	items = new Items(map);
 	
