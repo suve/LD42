@@ -40,6 +40,15 @@ const DEATH_ANIM_TIME = DEATH_TIME * 0.9;
 const WALKER_ACCEL = 120 / 8;
 const WALKER_MAX_SPEED = 36 / 8;
 
+const JUMPER_ACCEL = 96 / 8;
+const JUMPER_MAX_SPEED = 30 / 8;
+const JUMPER_JUMP_FORCE = 72 / 8;
+const JUMPER_JUMP_TRIGGER = 10;
+
+const JUMPER_AIR_ACCEL_FACTOR = 0.75;
+const JUMPER_AIR_SPEED_FACTOR = 1.5;
+
+
 // Ugh
 const ARROW_LEFT = 37;
 const ARROW_UP = 38;
@@ -315,6 +324,21 @@ function overlap(x1, y1, w1, h1, x2, y2, w2, h2) {
 	return !( (x2 > x1+w1) || (x2+w2 < x1) || (y2-h2 > y1) || (y2 < y1-h1) );
 }
 
+function distance(x1, y1, x2, y2) {
+	if(typeof y1 === "object") {
+		y2 = y1.y - (y1.h / 2);
+		x2 = y1.x + (y1.w / 2);
+	}
+	if(typeof x1 === "object") {
+		y1 = x1.y - (x1.h / 2);
+		x1 = x1.x + (x1.w / 2);
+	}
+	
+	let dx = x2 - x1;
+	let dy = y2 - y1;
+	return Math.sqrt(dx*dx + dy*dy);
+}
+
 function calculateWalkerMovement(e) {
 	if(e.facing == FACING_LEFT) {
 		e.xVel -= WALKER_ACCEL * CYCLE_SECONDS;
@@ -350,12 +374,49 @@ function calculateWalkerMovement(e) {
 }
 
 function calculateJumperMovement(e) {
+	let triggered = distance(e, player) < JUMPER_JUMP_TRIGGER;
+	let facingPlayer = e.facing == (player.x > e.x) ? FACING_RIGHT : FACING_LEFT;
+	 
+	if((e.yVel === null) && triggered && facingPlayer) {
+		e.yVel = -JUMPER_JUMP_FORCE;
+		Sfx.play(jumperJumpSfx);
+	}
+	
+	let accelFactor = 1;
+	let speedFactor = 1;
+	if(e.yVel !== null) {
+		e.yVel += GRAVITY * CYCLE_SECONDS;
+		e.y += e.yVel * CYCLE_SECONDS;
+		
+		if(e.yVel < 0) {
+			if(map.collides(e.x, e.y-e.h) || map.collides(e.x + e.w, e.y-e.h)) {
+				e.y = Math.floor(e.y)+1;
+				e.yVel = 0;
+			}
+		} else {
+			if(map.collides(e.x, e.y) || map.collides(e.x + e.w, e.y)) {
+				e.y = Math.floor(e.y);
+				e.yVel = null;
+			}
+		}
+		
+		accelFactor = JUMPER_AIR_ACCEL_FACTOR;
+		speedFactor = JUMPER_AIR_SPEED_FACTOR;
+	}
+	
+	let maxSpeed = JUMPER_MAX_SPEED * speedFactor;
 	if(e.facing == FACING_LEFT) {
-		e.xVel -= WALKER_ACCEL / 4 * CYCLE_SECONDS;
-		if(e.xVel < -WALKER_MAX_SPEED) e.xVel = -WALKER_MAX_SPEED;
+		e.xVel -= JUMPER_ACCEL * CYCLE_SECONDS * accelFactor;
+		if(e.xVel < -maxSpeed)
+			e.xVel = -maxSpeed;
+		else if((!facingPlayer) && (e.xVel < 0))
+			e.facing = FACING_LEFT;
 	} else {
-		e.xVel += WALKER_ACCEL / 4 * CYCLE_SECONDS;
-		if(e.xVel > WALKER_MAX_SPEED) e.xVel = WALKER_MAX_SPEED;
+		e.xVel += JUMPER_ACCEL * CYCLE_SECONDS * accelFactor;
+		if(e.xVel > maxSpeed)
+			e.xVel = maxSpeed;
+		else if((!facingPlayer) && (e.xVel > 0))
+			e.facing = FACING_RIGHT;
 	}
 	
 	let oldX = e.x;
@@ -365,19 +426,27 @@ function calculateJumperMovement(e) {
 	if(e.xVel > 0) {
 		turnAround =
 			map.collides(e.x+e.w, e.y-0.05) || map.collides(e.x+e.w, e.y-e.h) || 
-			map.deadly(e.x+e.w, e.y-0.05) || map.deadly(e.x+e.w, e.y-e.h) ||
-			!map.collides(e.x+e.w, e.y);
+			map.deadly(e.x+e.w, e.y-0.05) || map.deadly(e.x+e.w, e.y-e.h);
+		
+		if(e.yVel === null) turnAround = turnAround || !map.collides(e.x+e.w, e.y);
 	} else {
 		turnAround =
 			map.collides(e.x, e.y-0.05) || map.collides(e.x, e.y-e.h) ||
-			map.deadly(e.x, e.y-0.05) || map.deadly(e.x, e.y-e.h) ||
-			!map.collides(e.x,e.y);
+			map.deadly(e.x, e.y-0.05) || map.deadly(e.x, e.y-e.h);
+		
+		if(e.yVel === null) turnAround = turnAround || !map.collides(e.x,e.y);
 	}
 	
 	if(turnAround) {
 		e.x = oldX;
 		e.xVel = 0;
-		e.facing = !e.facing;
+		if(e.yVel === null) e.facing = !e.facing;
+	}
+	
+	if(e.yVel === null) {
+		if(!(map.collides(e.x, e.y) || map.collides(e.x + e.w, e.y))) {
+			e.yVel = 0;
+		}
 	}
 	
 	e.animate(CYCLE_TICKS);
