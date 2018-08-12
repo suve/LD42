@@ -117,19 +117,19 @@ function hex_to_tile($hex) {
 			return TILE_JUMPER_L;
 		
 		default:
-			fprintf(STDERR, "What the fuck is \"$hex\"?\n");
+			fprintf(STDERR, "map-to-js.php: What the fuck is \"$hex\"?\n");
 			exit(1);
 	}
 }
 
 if($argc < 2) {
-	fprintf(STDERR, "You must provide a FILE to be processed\n");
+	fprintf(STDERR, "map-to-js.php: You must provide a FILE to be processed\n");
 	exit(1);
 }
 
 $img = imagecreatefrompng($argv[1]);
 if($img === FALSE) {
-	fprintf(STDERR, "Failed to open \"" . $argv[1] . "\"\n");
+	fprintf(STDERR, "map-to-js.php: Failed to open \"" . $argv[1] . "\"\n");
 	exit(1);
 }
 
