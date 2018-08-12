@@ -15,16 +15,18 @@
  * along with this program (LICENCE.txt). 
  * If not, see <http://www.gnu.org/licenses/>.
  */
-const ACHIEV_JUMP     = 0;
-const ACHIEV_COIN     = 1;
-const ACHIEV_LAND     = 2;
-const ACHIEV_OUCH     = 3;
-const ACHIEV_SKY      = 4;
-const ACHIEV_WALLHIT  = 5;
-const ACHIEV_SPIKES   = 6;
-const ACHIEV_ONE_UP   = 7;
-const ACHIEV_ONE_DOWN = 8;
-const ACHIEV_PLAYTIME = 9;
+const ACHIEV_JUMP        =  0;
+const ACHIEV_COIN        =  1;
+const ACHIEV_LAND        =  2;
+const ACHIEV_OUCH        =  3;
+const ACHIEV_SKY         =  4;
+const ACHIEV_WALLHIT     =  5;
+const ACHIEV_SPIKES      =  6;
+const ACHIEV_ONE_UP      =  7;
+const ACHIEV_ONE_DOWN    =  8;
+const ACHIEV_WALKER_DIE  =  9;
+const ACHIEV_WALKER_KILL = 10;
+const ACHIEV_PLAYTIME    = 11;
 
 const AchievementSteps = [1, 5, 10, 25, 50, 75, 100, 200, 300, 400, 500];
 

@@ -333,6 +333,7 @@ function calculateEnemies() {
 			calculateWalkerMovement(e);
 			
 			if(player.yVel > 0 && overlap(player, e)) {
+				Achievements.add(ACHIEV_WALKER_KILL);
 				Sfx.play(walkerDeathSfx);
 				e.dead = 0;
 			}
@@ -457,6 +458,7 @@ function checkPlayerDamage() {
 		if(!overlap(player, enemies[idx])) continue;
 		
 		if(player.health <= 1) Sfx.play(walkerAttackSfx);
+		Achievements.add(ACHIEV_WALKER_DIE);
 		return true;
 	}
 	
