@@ -58,8 +58,13 @@ const ARROW_DOWN = 40;
 // Global vars, fuck yeah
 var appstart;
 var canvas, ctx, ctxOrg, viewport;
+
 var keystate = [];
 var items, map;
+
+var levelNo = 0;
+var inGame = false;
+
 var player = null;
 var enemies = [];
 
@@ -258,33 +263,46 @@ function drawFrame_loading() {
 	drawLogo();
 }
 
-function drawFrame_title() {
-	const AnimationOffset = CYCLES_PER_SECOND*2;
-	const AnimationLength = CYCLES_PER_SECOND;
+function drawIntermissionFrame() {
 	const TargetScale = 0.666;
 	
+	let AnimationOffset, AnimationLength;
+	if(levelNo == 0) {
+		AnimationOffset = CYCLES_PER_SECOND*2;
+		AnimationLength = CYCLES_PER_SECOND;
+	} else {
+		AnimationOffset = CYCLES_PER_SECOND/4;
+		AnimationLength = CYCLES_PER_SECOND*3/4;
+	}
+	
+	
 	fillRect(0, 0, null ,null, 'black');
-	if(__titleScreenCycles < AnimationOffset) {
+	if(intermissionCycles < AnimationOffset) {
 		drawLogo();
 		return;
 	}
 	
-	let progress = (__titleScreenCycles - AnimationOffset) / AnimationLength;
+	let progress = (intermissionCycles - AnimationOffset) / AnimationLength;
 	if(progress > 1.0) progress = 1.0;
 	
 	drawLogo(1 - progress*(1-TargetScale));
 	
-	printTextCentered(canvas.width / 2, canvas.height * 0.75, 'Use the arrow keys to move', 18*progress, 'white');
+	
+	let toptext = (levelNo == 0) ? 'Use the arrow keys to move' : 'Level ' + (1 + levelNo);
+	printTextCentered(canvas.width / 2, canvas.height * 0.75, toptext, 18*progress, 'white');
+	
 	printTextCentered(canvas.width / 2, canvas.height * 0.85, 'Press space to start!', 18*progress, 'white');
 	printTextCentered(canvas.width / 2, canvas.height * 0.96, 'a Ludum Dare 42 entry by suve', 12*progress, '#7f7f7f');
 }
 
-var __titleScreenCycles = 0;
+var intermissionCycles = 0;
 
-function titleScreenLogic() {
-	__titleScreenCycles += 1;
-	
-	return keystate[32];
+function intermissionLogic() {
+	intermissionCycles += 1;
+	if(keystate[32] && !inGame) {
+		resetLevel();
+		inGame = true;
+	}
 }
 
 
@@ -660,6 +678,14 @@ function gameLogic() {
 	items.collect(player.x+player.w, player.y-0.05);
 	items.collect(player.x, player.y-player.h);
 	items.collect(player.x+player.w, player.y-player.h);
+	
+	if(inGame) {
+		let tile = map.getTile(player.x + player.w/2, player.y - player.h/2);
+		if(tile == TILE_EXIT) {
+			levelNo += 1;
+			inGame = false;
+		}
+	}
 }
 
 function resize_canvas() {
@@ -719,7 +745,13 @@ function spawnActors(map) {
 }
 
 function resetLevel() {
-	map = new Map(level0_mapdata);
+	let _mapdata;
+	if(levelNo == 0)
+		_mapdata = level0_mapdata;
+	if(levelNo == 1)
+		_mapdata = level1_mapdata;
+	
+	map = new Map(_mapdata);
 	spawnActors(map);
 	items = new Items(map);
 }
@@ -768,7 +800,8 @@ function ld42_init() {
 	jumperJumpSfx = Assets.addSfx("../sfx/jumper-jump.wav");
 	
 	let loaded = false;
-	let inGame = false;
+	levelNo = 0;
+	inGame = false;
 	
 	let oldTicks = getTicks();
 	let main_loop = function() {
@@ -781,8 +814,8 @@ function ld42_init() {
 				while(cycles --> 0) gameLogic();
 				drawFrame();
 			} else {
-				while(cycles --> 0) inGame = inGame || titleScreenLogic();
-				drawFrame_title();
+				while(cycles --> 0) intermissionLogic();
+				drawIntermissionFrame();
 			}
 		} else {
 			drawFrame_loading();

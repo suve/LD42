@@ -26,7 +26,8 @@ function Items(map) {
 	for(let y = 0; y < map.h; ++y) {
 		for(let x = 0; x < map.w; ++x) {
 			let type = map.data[y][x];
-			if(type < 0) {
+			
+			if((type < 0) && (type > TILE_PLAYER)) {
 				this.__list.push({
 					'x': x,
 					'y': y,
@@ -57,6 +58,7 @@ function Items(map) {
 		if((x >= this.__map.w) || (y >= this.__map.h)) return;
 		
 		if(this.__map.data[y][x] >= 0) return;
+		if(this.__map.data[y][x] <= TILE_PLAYER) return;
 		this.__map.data[y][x] = 0;
 		
 		let count = this.__list.length;
