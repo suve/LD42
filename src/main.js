@@ -434,17 +434,21 @@ function calculateJumperMovement(e) {
 	}
 	
 	let maxSpeed = JUMPER_MAX_SPEED * speedFactor;
-	if(e.facing == FACING_LEFT) {
+	
+	let accelDir = e.facing;
+	if(triggered && !facingPlayer && (Math.abs(e.x-player.x) > 0.75)) accelDir = !accelDir;
+	
+	if(accelDir == FACING_LEFT) {
 		e.xVel -= JUMPER_ACCEL * CYCLE_SECONDS * accelFactor;
 		if(e.xVel < -maxSpeed)
 			e.xVel = -maxSpeed;
-		else if((!facingPlayer) && (e.xVel < 0))
+		else if(e.xVel < 0)
 			e.facing = FACING_LEFT;
 	} else {
 		e.xVel += JUMPER_ACCEL * CYCLE_SECONDS * accelFactor;
 		if(e.xVel > maxSpeed)
 			e.xVel = maxSpeed;
-		else if((!facingPlayer) && (e.xVel > 0))
+		else if(e.xVel > 0)
 			e.facing = FACING_RIGHT;
 	}
 	
@@ -811,7 +815,7 @@ function ld42_init() {
 	jumperJumpSfx = Assets.addSfx("../sfx/jumper-jump.wav");
 	
 	let loaded = false;
-	levelNo = LEVELS_TOTAL-1;
+	levelNo = 0;
 	inGame = false;
 	
 	let oldTicks = getTicks();
