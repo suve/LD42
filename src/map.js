@@ -19,6 +19,7 @@ const TILE_SPIKES = 3;
 const TILE_DEADLY = TILE_SPIKES;
 
 const TILE_COIN = -1;
+const TILE_POTION = -1;
 
 function Map(data) {
 	this.__copyData = function(data) {

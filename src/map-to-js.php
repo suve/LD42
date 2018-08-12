@@ -23,6 +23,7 @@ const TILE_WALL = 2;
 const TILE_SPIKES = 3;
 
 const TILE_COIN = -1;
+const TILE_POTION = -2;
 
 
 function int_to_rgb(int $int) {
@@ -85,6 +86,9 @@ function hex_to_tile($hex) {
 		
 		case 'FFFF00':
 			return TILE_COIN;
+			
+		case 'FFFFFF':
+			return TILE_POTION;
 		
 		default:
 			fprintf(stderr, "What the fuck is \"$hex\"?\n");

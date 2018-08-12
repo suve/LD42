@@ -15,18 +15,24 @@
  * along with this program (LICENCE.txt).
  * If not, see <http://www.gnu.org/licenses/>.
  */
-const COIN_ANIM_FRAMES = 4;
-const COIN_ANIM_FPS = 8;
-const COIN_ANIM_TICKS = Math.floor(1000 / COIN_ANIM_FPS);
+const ITEM_ANIM_FRAMES = 4;
+const ITEM_ANIM_FPS = 8;
+const ITEM_ANIM_TICKS = Math.floor(1000 / ITEM_ANIM_FPS);
 
-function Coins(map) {
+function Items(map) {
 	this.__map = map;
 	this.__list = [];
 	
 	for(let y = 0; y < map.h; ++y) {
 		for(let x = 0; x < map.w; ++x) {
-			if(map.data[y][x] == TILE_COIN) {
-				this.__list.push({'x': x, 'y': y, 'dead': null});
+			let type = map.data[y][x];
+			if(type < 0) {
+				this.__list.push({
+					'x': x,
+					'y': y,
+					'type': type,
+					'dead': null
+				});
 			}
 		}
 	}
@@ -62,7 +68,7 @@ function Coins(map) {
 			let e = this.__list[idx];
 			if(e.dead !== null) {
 				e.dead += dt;
-				if(e.dead >= COIN_ANIM_FRAMES * (COIN_ANIM_TICKS / 2)) {
+				if(e.dead >= ITEM_ANIM_FRAMES * (ITEM_ANIM_TICKS / 2)) {
 					this.__list.splice(idx, 1);
 					--count;
 					
@@ -76,16 +82,18 @@ function Coins(map) {
 	
 	this.render = function() {
 		let scale = viewport.getScale();
-		let liveFrame = Math.floor(getTicks() / COIN_ANIM_TICKS) % COIN_ANIM_FRAMES;
+		let liveFrame = Math.floor(getTicks() / ITEM_ANIM_TICKS) % ITEM_ANIM_FRAMES;
 		
 		let count = this.__list.length;
 		for(let idx = 0; idx < count; ++idx) {
 			let e = this.__list[idx];
+			let gfx = (e.type === TILE_COIN) ? coinGfx[scale] : potionGfx[scale];
+			
 			if(e.dead === null) {
-				ctx.drawImage(coinGfx[scale], liveFrame*scale, 0, scale, scale, e.x*scale, e.y*scale, scale, scale);
+				ctx.drawImage(gfx, liveFrame*scale, 0, scale, scale, e.x*scale, e.y*scale, scale, scale);
 			} else {
-				let deadFrame = Math.floor(e.dead / (COIN_ANIM_TICKS / 2));
-				ctx.drawImage(coinGfx[scale], deadFrame*scale, scale, scale, scale, e.x*scale, e.y*scale, scale, scale);
+				let deadFrame = Math.floor(e.dead / (ITEM_ANIM_TICKS / 2));
+				ctx.drawImage(gfx, deadFrame*scale, scale, scale, scale, e.x*scale, e.y*scale, scale, scale);
 			}
 		}
 	};

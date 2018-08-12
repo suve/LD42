@@ -44,11 +44,11 @@ const ARROW_DOWN = 40;
 var appstart;
 var canvas, ctx, ctxOrg, viewport;
 var keystate = [];
-var coins, map;
+var items, map;
 var player;
 
 var logoGfx = [];
-var coinGfx = [], playerGfx = [], worldGfx = [];
+var coinGfx = [], potionGfx = [], playerGfx = [], worldGfx = [];
 var achievGfx;
 var achievSfx, coinSfx, jumpSfx, landSfx, spikesSfx, ouchHeadSfx, ouchWallSfx;
 
@@ -121,7 +121,7 @@ function drawFrame() {
 	ctx.translate(-Math.floor(viewport.x * scale), -Math.floor(viewport.y * scale));
 	
 	map.draw();
-	coins.render();
+	items.render();
 	
 	let frame = player.frame;
 	if(player.jumping()) frame = 3;
@@ -392,11 +392,11 @@ function gameLogic() {
 		return;
 	}
 	
-	coins.decay(CYCLE_TICKS);
-	coins.collect(player.x, player.y-0.05);
-	coins.collect(player.x+player.w, player.y-0.05);
-	coins.collect(player.x, player.y-player.h);
-	coins.collect(player.x+player.w, player.y-player.h);
+	items.decay(CYCLE_TICKS);
+	items.collect(player.x, player.y-0.05);
+	items.collect(player.x+player.w, player.y-0.05);
+	items.collect(player.x, player.y-player.h);
+	items.collect(player.x+player.w, player.y-player.h);
 }
 
 function resize_canvas() {
@@ -419,7 +419,7 @@ function resize_canvas() {
 
 function resetLevel() {
 	map = new Map(mapdata);
-	coins = new Coins(map);
+	items = new Items(map);
 	player = new Player(0, map.h-5);
 }
 
@@ -444,6 +444,7 @@ function ld42_init() {
 		playerGfx[s] = Assets.addGfx("../gfx/hero-"+s+"px.png");
 		worldGfx[s] = Assets.addGfx("../gfx/world-"+s+"px.png");
 		coinGfx[s] = Assets.addGfx("../gfx/coin-"+s+"px.png");
+		potionGfx[s] = Assets.addGfx("../gfx/potion-"+s+"px.png");
 	}
 	
 	achievSfx = Assets.addSfx("../sfx/achiev.wav");
