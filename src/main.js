@@ -62,6 +62,7 @@ var canvas, ctx, ctxOrg, viewport;
 var keystate = [];
 var items, map;
 
+const LEVELS_TOTAL = 2;
 var levelNo = 0;
 var inGame = false;
 
@@ -288,10 +289,18 @@ function drawIntermissionFrame() {
 	drawLogo(1 - progress*(1-TargetScale));
 	
 	
-	let toptext = (levelNo == 0) ? 'Use the arrow keys to move' : 'Level ' + (1 + levelNo);
-	printTextCentered(canvas.width / 2, canvas.height * 0.75, toptext, 18*progress, 'white');
+	let top_text, bottom_text;
+	if(levelNo < LEVELS_TOTAL) {
+		top_text = (levelNo == 0) ? 'Use the arrow keys to move' : 'Level ' + (1 + levelNo);
+		bottom_text = 'Press space to start!';
+	} else {
+		top_text = 'That was the last level!';
+		bottom_text = 'Thanks for playing!';
+	}
 	
-	printTextCentered(canvas.width / 2, canvas.height * 0.85, 'Press space to start!', 18*progress, 'white');
+	printTextCentered(canvas.width / 2, canvas.height * 0.75, top_text, 18*progress, 'white');
+	printTextCentered(canvas.width / 2, canvas.height * 0.85, bottom_text, 18*progress, 'white');
+	
 	printTextCentered(canvas.width / 2, canvas.height * 0.96, 'a Ludum Dare 42 entry by suve', 12*progress, '#7f7f7f');
 }
 
@@ -299,6 +308,8 @@ var intermissionCycles = 0;
 
 function intermissionLogic() {
 	intermissionCycles += 1;
+	if(levelNo == LEVELS_TOTAL) return;
+	
 	if(keystate[32] && !inGame) {
 		resetLevel();
 		inGame = true;
@@ -824,7 +835,6 @@ function ld42_init() {
 	window.onresize = resize_canvas;
 	resize_canvas();
 	
-	resetLevel();
 	Achievements.reset();
 	
 	document.onkeydown = handleKeyDown;
