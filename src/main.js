@@ -453,17 +453,11 @@ function calculateJumperMovement(e) {
 	
 	let turnAround = false;
 	if(e.xVel > 0) {
-		turnAround =
-			map.collides(e.x+e.w, e.y-0.05) || map.collides(e.x+e.w, e.y-e.h) || 
-			map.deadly(e.x+e.w, e.y-0.05) || map.deadly(e.x+e.w, e.y-e.h);
-		
-		if(e.yVel === null) turnAround = turnAround || !map.collides(e.x+e.w, e.y);
+		turnAround = map.collides(e.x+e.w, e.y-0.05) || map.collides(e.x+e.w, e.y-e.h);
+		if(e.yVel === null) turnAround = turnAround || map.deadly(e.x+e.w, e.y-0.05) || map.deadly(e.x+e.w, e.y-e.h) || !map.collides(e.x+e.w, e.y);
 	} else {
-		turnAround =
-			map.collides(e.x, e.y-0.05) || map.collides(e.x, e.y-e.h) ||
-			map.deadly(e.x, e.y-0.05) || map.deadly(e.x, e.y-e.h);
-		
-		if(e.yVel === null) turnAround = turnAround || !map.collides(e.x,e.y);
+		turnAround = map.collides(e.x, e.y-0.05) || map.collides(e.x, e.y-e.h);
+		if(e.yVel === null) turnAround = turnAround || map.deadly(e.x, e.y-0.05) || map.deadly(e.x, e.y-e.h) || !map.collides(e.x,e.y);
 	}
 	
 	if(turnAround) {
