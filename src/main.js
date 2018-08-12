@@ -143,10 +143,16 @@ function drawPlayer() {
 function drawWalker(e) {
 	let scale = viewport.getScale();
 	
-	let frame = e.frame;
-	//if(e.jumping()) frame = 3;
-	//if(e.falling()) frame = 4;
-	ctx.drawImage(walkerGfx[scale], frame*scale, e.facing*scale, scale, scale, Math.floor(e.x*scale), Math.floor((e.y-1)*scale), scale, scale);
+	let frame, face;
+	if(e.dead === null) {
+		frame = e.frame;
+		face = e.facing; 
+	} else {
+		frame = Math.floor(e.dead / ANIM_DEATH_TICKS_PER_FRAME);
+		face = 2; // magic numbers FTW
+	}
+	
+	ctx.drawImage(walkerGfx[scale], frame*scale, face*scale, scale, scale, Math.floor(e.x*scale), Math.floor((e.y-1)*scale), scale, scale);
 }
 
 function drawEnemies() {
@@ -321,15 +327,24 @@ function calculateEnemies() {
 	let count = enemies.length;
 	let idx = 0;
 	while(idx < count) {
-		calculateWalkerMovement(enemies[idx]);
+		let e = enemies[idx];
 		
-		if(player.yVel > 0 && overlap(player, enemies[idx])) {
-			Sfx.play(walkerDeathSfx);
-			enemies.splice(idx, 1);
-			--count;
+		if(e.dead === null) {
+			calculateWalkerMovement(e);
+			
+			if(player.yVel > 0 && overlap(player, e)) {
+				Sfx.play(walkerDeathSfx);
+				e.dead = 0;
+			}
 		} else {
-			++idx;
+			e.dead += CYCLE_TICKS;
+			if(e.dead >= ANIM_DEATH_TICKS_TOTAL) {
+				enemies.splice(idx, 1);
+				--count;
+				continue;
+			}
 		}
+		++idx;
 	}
 }
 
@@ -438,10 +453,11 @@ function checkPlayerDamage() {
 	
 	let count = enemies.length;
 	for(let idx = 0; idx < count; ++idx) {
-		if(overlap(player, enemies[idx])) {
-			if(player.health <= 1) Sfx.play(walkerAttackSfx);
-			return true;
-		}
+		if(enemies[idx].dead !== null) continue;
+		if(!overlap(player, enemies[idx])) continue;
+		
+		if(player.health <= 1) Sfx.play(walkerAttackSfx);
+		return true;
 	}
 	
 	return false;

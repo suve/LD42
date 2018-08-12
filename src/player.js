@@ -21,6 +21,10 @@ const ANIM_TICKS_PER_FRAME = Math.floor(TICKS_PER_SECOND / ANIM_FRAMES_PER_SECON
 const FACING_LEFT = true;
 const FACING_RIGHT = false;
 
+const ANIM_DEATH_FRAMES = 5;
+const ANIM_DEATH_TICKS_PER_FRAME = ANIM_TICKS_PER_FRAME / 2;
+const ANIM_DEATH_TICKS_TOTAL = ANIM_DEATH_FRAMES * ANIM_DEATH_TICKS_PER_FRAME;
+
 function Player(x, y) {
 	this.x = x;
 	this.y = y;
