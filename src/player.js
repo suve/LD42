@@ -18,14 +18,14 @@
 const ANIM_FRAMES_PER_SECOND = 12;
 const ANIM_TICKS_PER_FRAME = Math.floor(TICKS_PER_SECOND / ANIM_FRAMES_PER_SECOND);
 
-const FACING_LEFT = 1;
-const FACING_RIGHT = 0;
+const FACING_LEFT = true;
+const FACING_RIGHT = false;
 
 function Player(x, y) {
 	this.x = x;
 	this.y = y;
-	this.w = 0.95;
-	this.h = 0.95;
+	this.w = 0.98;
+	this.h = 0.98;
 	this.facing = FACING_RIGHT;
 	this.xVel = 0;
 	this.yVel = null;

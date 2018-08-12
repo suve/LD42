@@ -37,6 +37,9 @@ const INVUL_BLINK_CYCLES = CYCLES_PER_SECOND / 10;
 const DEATH_TIME = 0.48;
 const DEATH_ANIM_TIME = DEATH_TIME * 0.9;
 
+const WALKER_ACCEL = 120 / 8;
+const WALKER_MAX_SPEED = 36 / 8;
+
 // Ugh
 const ARROW_LEFT = 37;
 const ARROW_UP = 38;
@@ -49,10 +52,14 @@ var canvas, ctx, ctxOrg, viewport;
 var keystate = [];
 var items, map;
 var player;
+var enemies = [];
 
 var logoGfx = [];
-var coinGfx = [], potionGfx = [], playerGfx = [], worldGfx = [];
+var coinGfx = [], potionGfx = [];
+var playerGfx = [], walkerGfx = [];
+var worldGfx = [];
 var achievGfx;
+
 var achievSfx, jumpSfx, landSfx, spikesSfx, ouchHeadSfx, ouchWallSfx;
 var coinSfx, oneUpSfx, oneDownSfx;
 
@@ -132,6 +139,22 @@ function drawPlayer() {
 	ctx.drawImage(playerGfx[scale], frame*scale, player.facing*scale, scale, scale, Math.floor(player.x*scale), Math.floor((player.y-1)*scale), scale, scale);
 }
 
+function drawWalker(e) {
+	let scale = viewport.getScale();
+	
+	let frame = e.frame;
+	//if(e.jumping()) frame = 3;
+	//if(e.falling()) frame = 4;
+	ctx.drawImage(walkerGfx[scale], frame*scale, e.facing*scale, scale, scale, Math.floor(e.x*scale), Math.floor((e.y-1)*scale), scale, scale);
+}
+
+function drawEnemies() {
+	let count = enemies.length;
+	for(let idx = 0; idx < count; ++idx) {
+		drawWalker(enemies[idx]);
+	}
+}
+
 function drawFrame() {
 	let scale = viewport.getScale();
 	viewport.update(player);
@@ -140,6 +163,7 @@ function drawFrame() {
 	
 	map.draw();
 	items.render();
+	drawEnemies();
 	drawPlayer();
 	
 	ctx.restore(); ctx.save();
@@ -258,6 +282,55 @@ function overlap(x1, y1, w1, h1, x2, y2, w2, h2) {
 	return !( (x2 > x1+w1) || (x2+w2 < x1) || (y2-h2 > y1) || (y2 < y1-h1) );
 }
 
+function calculateWalkerMovement(e) {
+	if(e.facing == FACING_LEFT) {
+		e.xVel -= WALKER_ACCEL * CYCLE_SECONDS;
+		if(e.xVel < -WALKER_MAX_SPEED) e.xVel = -WALKER_MAX_SPEED;
+	} else {
+		e.xVel += WALKER_ACCEL * CYCLE_SECONDS;
+		if(e.xVel > WALKER_MAX_SPEED) e.xVel = WALKER_MAX_SPEED;
+	}
+	
+	let oldX = e.x;
+	e.x += e.xVel * CYCLE_SECONDS;
+	
+	let turnAround = false;
+	if(e.xVel > 0) {
+		turnAround =
+			map.collides(e.x+e.w, e.y-0.05) || map.collides(e.x+e.w, e.y-e.h) || 
+			map.deadly(e.x+e.w, e.y-0.05) || map.deadly(e.x+e.w, e.y-e.h) ||
+			!map.collides(e.x+e.w, e.y);
+	} else {
+		turnAround =
+			map.collides(e.x, e.y-0.05) || map.collides(e.x, e.y-e.h) ||
+			map.deadly(e.x, e.y-0.05) || map.deadly(e.x, e.y-e.h) ||
+			!map.collides(e.x,e.y);
+	}
+	
+	if(turnAround) {
+		e.x = oldX;
+		e.xVel = 0;
+		e.facing = !e.facing;
+	}
+	
+	e.animate(CYCLE_TICKS);
+}
+
+function calculateEnemies() {
+	let count = enemies.length;
+	let idx = 0;
+	while(idx < count) {
+		calculateWalkerMovement(enemies[idx]);
+		
+		if(player.yVel > 0 && overlap(player, enemies[idx])) {
+			enemies.splice(idx, 1);
+			--count;
+		} else {
+			++idx;
+		}
+	}
+}
+
 function calculatePlayerMovement() {
 	if((keystate[ARROW_UP]) && (player.yVel === null)) {
 		player.yVel = -PLAYER_JUMP_FORCE;
@@ -361,6 +434,13 @@ function checkPlayerDamage() {
 		return true;
 	}
 	
+	let count = enemies.length;
+	for(let idx = 0; idx < count; ++idx) {
+		if(overlap(player, enemies[idx])) {
+			return true;
+		}
+	}
+	
 	return false;
 }
 
@@ -401,6 +481,8 @@ function gameLogic() {
 	}
 	
 	calculatePlayerMovement();
+	calculateEnemies();
+	
 	if(player.invul <= 0) {
 		if(checkPlayerDamage()) {
 			player.health -= 1;
@@ -443,10 +525,34 @@ function resize_canvas() {
 	canvas.style.margin = Math.floor((wndH - newH) / 2) + 'px auto';
 }
 
+function spawnEnemies(map) {
+	enemies = [];
+	for(let y = 0; y < map.h; ++y) {
+		for(let x = 0; x < map.w; ++x) {
+			let e = null;
+			if(map.data[y][x] === TILE_WALKER_R) {
+				e = new Player(x, y+1);
+				e.facing = FACING_RIGHT;
+			} else if(map.data[y][x] === TILE_WALKER_L) {
+				e = new Player(x, y+1);
+				e.facing = FACING_LEFT;
+			}
+			
+			if(e !== null) {
+				map.data[y][x] = 0;
+				enemies.push(e);
+			}
+		}
+	}
+}
+
 function resetLevel() {
 	viewport.setScale(8);
+	
 	map = new Map(mapdata);
+	spawnEnemies(map);
 	items = new Items(map);
+	
 	player = new Player(0, map.h-5);
 }
 
@@ -468,8 +574,11 @@ function ld42_init() {
 	const GfxSizes = [8, 12];
 	for(let idx = 0; idx < GfxSizes.length; ++idx) {
 		let s = GfxSizes[idx];
-		playerGfx[s] = Assets.addGfx("../gfx/hero-"+s+"px.png");
 		worldGfx[s] = Assets.addGfx("../gfx/world-"+s+"px.png");
+		
+		playerGfx[s] = Assets.addGfx("../gfx/hero-"+s+"px.png");
+		walkerGfx[s] = Assets.addGfx("../gfx/walker-"+s+"px.png");
+		
 		coinGfx[s] = Assets.addGfx("../gfx/coin-"+s+"px.png");
 		potionGfx[s] = Assets.addGfx("../gfx/potion-"+s+"px.png");
 	}
