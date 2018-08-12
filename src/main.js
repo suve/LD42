@@ -49,7 +49,7 @@ var player;
 
 var logoGfx = [];
 var achievGfx, coinGfx, playerGfx, worldGfx;
-var achievSfx, coinSfx, jumpSfx, landSfx, spikesSfx, ouchSfx;
+var achievSfx, coinSfx, jumpSfx, landSfx, spikesSfx, ouchHeadSfx, ouchWallSfx;
 
 
 function getTicks() {
@@ -260,7 +260,7 @@ function calculatePlayerMovement() {
 				if(player.y-player.h < 0) {
 					Achievements.add(ACHIEV_SKY);
 				} else if(player.yVel <= OUCH_SFX_THRESHOLD) {
-					Sfx.play(ouchSfx);
+					Sfx.play(ouchHeadSfx);
 					Achievements.add(ACHIEV_OUCH);
 				}
 				
@@ -314,7 +314,10 @@ function calculatePlayerMovement() {
 			map.collides(player.x, player.y-0.05) || map.collides(player.x, player.y-player.h) ||
 			map.collides(player.x+player.w, player.y-0.05) || map.collides(player.x+player.w, player.y-player.h)
 		) {
-			if(Math.abs(player.xVel) >= PLAYER_MAX_SPEED*0.99) Achievements.add(ACHIEV_WALLHIT);
+			if(Math.abs(player.xVel) >= PLAYER_MAX_SPEED*0.99) {
+				Achievements.add(ACHIEV_WALLHIT);
+				Sfx.play(ouchWallSfx);
+			}
 			
 			player.x = oldX;
 			player.xVel = 0;
@@ -441,7 +444,8 @@ function ld42_init() {
 	coinSfx = Assets.addSfx("../sfx/coin.wav");
 	jumpSfx = Assets.addSfx("../sfx/jump.wav");
 	landSfx = Assets.addSfx("../sfx/ground.wav");
-	ouchSfx = Assets.addSfx("../sfx/hit-head.wav");
+	ouchHeadSfx = Assets.addSfx("../sfx/hit-head.wav");
+	ouchWallSfx = Assets.addSfx("../sfx/hit-wall.wav");
 	spikesSfx = Assets.addSfx("../sfx/spikes.wav");
 	
 	let loaded = false;
