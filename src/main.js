@@ -658,16 +658,12 @@ function gameLogic() {
 	
 	if(player.invul <= 0) {
 		if(checkPlayerDamage()) {
-			player.health -= 1;
-			if(player.health <= 0) {
+			if(player.health <= 1) {
 				player.dead = 0;
 				return;
 			} 
 			
-			player.invul = INVUL_CYCLES;
-			viewport.setScale(viewport.getScale() - 4);
-			Achievements.add(ACHIEV_ONE_DOWN);
-			Sfx.play(oneDownSfx);
+			powerDown();
 		}
 	} else {
 		player.invul--;

@@ -25,6 +25,8 @@ const ANIM_DEATH_FRAMES = 5;
 const ANIM_DEATH_TICKS_PER_FRAME = ANIM_TICKS_PER_FRAME / 2;
 const ANIM_DEATH_TICKS_TOTAL = ANIM_DEATH_FRAMES * ANIM_DEATH_TICKS_PER_FRAME;
 
+const PLAYER_MAX_HP = 2;
+
 function Player(x, y) {
 	this.x = x;
 	this.y = y;
@@ -76,4 +78,33 @@ function Player(x, y) {
 	};
 	
 	this.stopAnimation();
+}
+
+function canPowerUp() {
+	return player.health < PLAYER_MAX_HP;
+}
+
+function canPowerDown() {
+	return player.health > 1;
+}
+
+function powerUp() {
+	if(!canPowerUp()) return;
+	
+	Sfx.play(oneUpSfx);
+	viewport.setScale(viewport.getScale() + 4);
+	player.health += 1;
+	
+	Achievements.add(ACHIEV_ONE_UP);
+}
+
+function powerDown() {
+	if(!canPowerDown()) return;
+	
+	Sfx.play(oneDownSfx);
+	viewport.setScale(viewport.getScale() - 4);
+	player.health -= 1;
+	player.invul = INVUL_CYCLES;
+	
+	Achievements.add(ACHIEV_ONE_DOWN);
 }

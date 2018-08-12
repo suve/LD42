@@ -43,11 +43,11 @@ function Items(map) {
 			Achievements.add(ACHIEV_COIN);
 			Sfx.play(coinSfx);
 		} else {
-			player.health += 1;
-			viewport.setScale(viewport.getScale() + 4);
-			Achievements.add(ACHIEV_ONE_UP);
-			Sfx.play(oneUpSfx);
+			if(!canPowerUp()) return false;
+			powerUp();
 		}
+		
+		return true;
 	}
 	
 	this.collect = function(x, y) {
@@ -66,8 +66,7 @@ function Items(map) {
 			let e = this.__list[idx];
 			
 			if((e.x === x) && (e.y === y)) {
-				this.apply(e.type);
-				e.dead = 0;
+				if(this.apply(e.type)) e.dead = 0;
 				return;
 			}
 		}
