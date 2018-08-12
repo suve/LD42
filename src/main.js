@@ -464,7 +464,7 @@ function calculateEnemies() {
 			else
 				calculateJumperMovement(e);
 			
-			if(player.yVel > 0 && overlap(player, e)) {
+			if(player.yVel > 0 && overlap(player, e) && (player.y < e.y)) {
 				Achievements.add(ACHIEV_WALKER_KILL);
 				Sfx.play((e.type == 0) ? walkerDeathSfx : jumperDeathSfx);
 				e.dead = 0;
