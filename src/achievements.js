@@ -22,7 +22,9 @@ const ACHIEV_OUCH     = 3;
 const ACHIEV_SKY      = 4;
 const ACHIEV_WALLHIT  = 5;
 const ACHIEV_SPIKES   = 6;
-const ACHIEV_PLAYTIME = 7;
+const ACHIEV_ONE_UP   = 7;
+const ACHIEV_ONE_DOWN = 8;
+const ACHIEV_PLAYTIME = 9;
 
 const AchievementSteps = [1, 5, 10, 25, 50, 75, 100, 200, 300, 400, 500];
 

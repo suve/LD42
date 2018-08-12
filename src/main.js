@@ -411,6 +411,7 @@ function gameLogic() {
 			
 			player.invul = INVUL_CYCLES;
 			viewport.setScale(viewport.getScale() - 4);
+			Achievements.add(ACHIEV_ONE_DOWN);
 			Sfx.play(oneDownSfx);
 		}
 	} else {

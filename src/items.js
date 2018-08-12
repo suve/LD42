@@ -44,6 +44,7 @@ function Items(map) {
 		} else {
 			player.health += 1;
 			viewport.setScale(viewport.getScale() + 4);
+			Achievements.add(ACHIEV_ONE_UP);
 			Sfx.play(oneUpSfx);
 		}
 	}
