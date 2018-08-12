@@ -47,8 +47,10 @@ var keystate = [];
 var coins, map;
 var player;
 
+var logoGfx = [];
 var achievGfx, coinGfx, playerGfx, worldGfx;
 var achievSfx, coinSfx, jumpSfx, landSfx, spikesSfx, ouchSfx;
+
 
 function getTicks() {
 	var d = new Date();
@@ -130,16 +132,26 @@ function drawFrame() {
 	printText(0, 0, fps+'FPS', 12, 'white');
 }
 
+function drawLogo() {
+	const LogoPos = [3, 58, 98, 133];
+	
+	let pieces = logoGfx.length;
+	for(let idx = 0; idx < pieces; ++idx) {
+		if(!logoGfx[idx].complete) return;
+		
+		ctx.drawImage(logoGfx[idx], Math.floor((canvas.width - logoGfx[idx].width) / 2), LogoPos[idx]);
+	}
+}
+
 function drawFrame_loading() {
 	let files = Assets.getList();
 	let count = files.length;
 	for(let idx = 0; idx < count; ++idx) {
 		let f = files[idx];
-		printText(32, 16 + 12*idx, f.path, 10, f.ready ? 'lime' : 'red');
+		printText(32, 16 + 12*idx, f.path, 10, f.ready ? 'lime' : '#7F7F7F');
 	}
 	
-	let fps = countFPS();
-	printText(0, 0, fps+'FPS', 12, 'white');
+	drawLogo();
 }
 
 function keycode(ev) {
@@ -361,6 +373,11 @@ function ld42_init() {
 	ctx = canvas.getContext('2d', { 'alpha': false });
 	ctx.save();
 	viewport = new Viewport();
+	
+	logoGfx[0] = Assets.addGfx("../gfx/logo-super.png");
+	logoGfx[1] = Assets.addGfx("../gfx/logo-over.png");
+	logoGfx[2] = Assets.addGfx("../gfx/logo-42k.png");
+	logoGfx[3] = Assets.addGfx("../gfx/logo-deluxe.png");
 	
 	achievGfx = Assets.addGfx("../gfx/achievements.png");
 	playerGfx = Assets.addGfx("../gfx/hero-8px.png");
