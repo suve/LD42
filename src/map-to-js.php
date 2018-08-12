@@ -24,6 +24,10 @@ const TILE_SPIKES = 3;
 
 const TILE_COIN = -1;
 const TILE_POTION = -2;
+
+const TILE_PLAYER = -40;
+const TILE_EXIT   = -41;
+
 const TILE_WALKER_R = -50;
 const TILE_WALKER_L = -51;
 const TILE_JUMPER_R = -52;
@@ -94,6 +98,12 @@ function hex_to_tile($hex) {
 		case 'FFFFFF':
 			return TILE_POTION;
 			
+		case '0000C4':
+			return TILE_PLAYER;
+			
+		case '0000FF':
+			return TILE_EXIT;
+		
 		case 'FF0000':
 			return TILE_WALKER_R;
 			

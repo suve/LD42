@@ -60,7 +60,7 @@ var appstart;
 var canvas, ctx, ctxOrg, viewport;
 var keystate = [];
 var items, map;
-var player;
+var player = null;
 var enemies = [];
 
 var logoGfx = [];
@@ -680,12 +680,19 @@ function resize_canvas() {
 	canvas.style.margin = Math.floor((wndH - newH) / 2) + 'px auto';
 }
 
-function spawnEnemies(map) {
+function spawnActors(map) {
 	enemies = [];
 	for(let y = 0; y < map.h; ++y) {
 		for(let x = 0; x < map.w; ++x) {
 			let e = null;
-			if(map.data[y][x] === TILE_WALKER_R) {
+			if(map.data[y][x] === TILE_PLAYER) {
+				let hp = ((player != null) && (player.health > 0)) ? player.health : 1;
+				
+				player = new Player(x, y+1);
+				player.health = hp;
+				
+				map.data[y][x] = 0;
+			} else if(map.data[y][x] === TILE_WALKER_R) {
 				e = new Player(x, y+1);
 				e.facing = FACING_RIGHT;
 				e.type = 0;
@@ -712,13 +719,9 @@ function spawnEnemies(map) {
 }
 
 function resetLevel() {
-	viewport.setScale(8);
-	
 	map = new Map(test_mapdata);
-	spawnEnemies(map);
+	spawnActors(map);
 	items = new Items(map);
-	
-	player = new Player(0, map.h-5);
 }
 
 function ld42_init() {

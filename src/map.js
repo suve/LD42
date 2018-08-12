@@ -21,6 +21,9 @@ const TILE_DEADLY = TILE_SPIKES;
 const TILE_COIN = -1;
 const TILE_POTION = -2;
 
+const TILE_PLAYER = -40;
+const TILE_EXIT   = -41;
+
 const TILE_WALKER_R = -50;
 const TILE_WALKER_L = -51;
 const TILE_JUMPER_R = -52;
