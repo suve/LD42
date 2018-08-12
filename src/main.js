@@ -145,7 +145,7 @@ function drawFrame() {
 }
 
 function drawLogo(scale) {
-	const LogoPos = [3, 58, 98, 133];
+	const LogoPos = [5, 60, 100, 130];
 	
 	if(scale === undefined) scale = 1.0;
 	
