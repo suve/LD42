@@ -63,7 +63,7 @@ var canvas, ctx, ctxOrg, viewport;
 var keystate = [];
 var items, map;
 
-const LEVELS_TOTAL = 3;
+const LEVELS_TOTAL = 4;
 var levelNo = 0;
 var inGame = false;
 
@@ -768,6 +768,8 @@ function resetLevel() {
 		_mapdata = level1_mapdata;
 	if(levelNo == 2)
 		_mapdata = level2_mapdata;
+	if(levelNo == 3)
+		_mapdata = level3_mapdata;
 	
 	map = new Map(_mapdata);
 	spawnActors(map);
