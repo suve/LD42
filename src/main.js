@@ -498,6 +498,14 @@ function calculateEnemies() {
 				Sfx.play((e.type == 0) ? walkerDeathSfx : jumperDeathSfx);
 				e.dead = 0;
 			}
+			
+			if((e.dead === null) && (e.type == 1) && (e.yVel !== null)) {
+				if(map.deadly(e.x, e.y) || map.deadly(e.x+e.w, e.y) || map.deadly(e.x, e.y-e.h) || map.deadly(e.x+e.w, e.y-e.h)) {
+					Achievements.add(ACHIEV_JUMPER_SPIKES);
+					Sfx.play(jumperDeathSfx);
+					e.dead = 0;
+				}
+			}
 		} else {
 			e.dead += CYCLE_TICKS;
 			if(e.dead >= ANIM_DEATH_TICKS_TOTAL) {
@@ -809,7 +817,7 @@ function ld42_init() {
 	jumperJumpSfx = Assets.addSfx("../sfx/jumper-jump.wav");
 	
 	let loaded = false;
-	levelNo = 0;
+	levelNo = LEVELS_TOTAL-1;
 	inGame = false;
 	
 	let oldTicks = getTicks();

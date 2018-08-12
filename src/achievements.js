@@ -28,7 +28,8 @@ const ACHIEV_WALKER_DIE  =  9;
 const ACHIEV_WALKER_KILL = 10;
 const ACHIEV_JUMPER_DIE  = 11;
 const ACHIEV_JUMPER_KILL = 12;
-const ACHIEV_PLAYTIME    = 13;
+const ACHIEV_JUMPER_SPIKES = 13;
+const ACHIEV_PLAYTIME    = 14;
 
 const AchievementSteps = [1, 5, 10, 25, 50, 75, 100, 200, 300, 400, 500];
 
