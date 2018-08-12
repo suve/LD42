@@ -50,7 +50,8 @@ var player;
 var logoGfx = [];
 var coinGfx = [], potionGfx = [], playerGfx = [], worldGfx = [];
 var achievGfx;
-var achievSfx, coinSfx, jumpSfx, landSfx, spikesSfx, ouchHeadSfx, ouchWallSfx;
+var achievSfx, jumpSfx, landSfx, spikesSfx, ouchHeadSfx, ouchWallSfx;
+var coinSfx, oneUpSfx;
 
 
 function getTicks() {
@@ -418,6 +419,7 @@ function resize_canvas() {
 }
 
 function resetLevel() {
+	viewport.setScale(8);
 	map = new Map(mapdata);
 	items = new Items(map);
 	player = new Player(0, map.h-5);
@@ -449,6 +451,7 @@ function ld42_init() {
 	
 	achievSfx = Assets.addSfx("../sfx/achiev.wav");
 	coinSfx = Assets.addSfx("../sfx/coin.wav");
+	oneUpSfx = Assets.addSfx("../sfx/1up.wav");
 	jumpSfx = Assets.addSfx("../sfx/jump.wav");
 	landSfx = Assets.addSfx("../sfx/ground.wav");
 	ouchHeadSfx = Assets.addSfx("../sfx/hit-head.wav");

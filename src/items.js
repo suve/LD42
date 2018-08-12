@@ -37,6 +37,16 @@ function Items(map) {
 		}
 	}
 	
+	this.apply = function(type) {
+		if(type === TILE_COIN) {
+			Achievements.add(ACHIEV_COIN);
+			Sfx.play(coinSfx);
+		} else {
+			viewport.setScale(viewport.getScale() + 4);
+			Sfx.play(oneUpSfx);
+		}
+	}
+	
 	this.collect = function(x, y) {
 		x = Math.floor(x);
 		y = Math.floor(y);
@@ -44,7 +54,7 @@ function Items(map) {
 		if((x < 0) || (y < 0)) return;
 		if((x >= this.__map.w) || (y >= this.__map.h)) return;
 		
-		if(this.__map.data[y][x] !== TILE_COIN) return;
+		if(this.__map.data[y][x] >= 0) return;
 		this.__map.data[y][x] = 0;
 		
 		let count = this.__list.length;
@@ -52,8 +62,7 @@ function Items(map) {
 			let e = this.__list[idx];
 			
 			if((e.x === x) && (e.y === y)) {
-				Achievements.add(ACHIEV_COIN);
-				Sfx.play(coinSfx);
+				this.apply(e.type);
 				e.dead = 0;
 				return;
 			}
