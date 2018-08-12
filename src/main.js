@@ -28,6 +28,7 @@ const PLAYER_MAX_SPEED = 96 / 8;
 const PLAYER_JUMP_FORCE = 88 / 8;
 const GRAVITY = 88 / 8;
 const LAND_SFX_THRESHOLD = GRAVITY * 0.75;
+const LAND_HARD_THRESHOLD = GRAVITY * 1.33;
 const OUCH_SFX_THRESHOLD = -PLAYER_JUMP_FORCE / 2;
 const AIR_CONTROL = 0.33;
 
@@ -75,7 +76,7 @@ var playerGfx = [], walkerGfx = [], jumperGfx = [];
 var worldGfx = [];
 var achievGfx;
 
-var achievSfx, jumpSfx, landSfx, spikesSfx, ouchHeadSfx, ouchWallSfx;
+var achievSfx, jumpSfx, landSfx, landHardSfx, spikesSfx, ouchHeadSfx, ouchWallSfx;
 var walkerAttackSfx, walkerDeathSfx;
 var jumperAttackSfx, jumperDeathSfx, jumperJumpSfx;
 var coinSfx, oneUpSfx, oneDownSfx;
@@ -542,9 +543,11 @@ function calculatePlayerMovement() {
 			}
 		} else {
 			if(map.collides(player.x, player.y) || map.collides(player.x + player.w, player.y)) {
-				if(player.yVel >= LAND_SFX_THRESHOLD) {
-					Sfx.play(landSfx);
+				if(player.yVel >= LAND_HARD_THRESHOLD) {
+					Sfx.play(landHardSfx);
 					Achievements.add(ACHIEV_LAND);
+				} else if(player.yVel > LAND_SFX_THRESHOLD) {
+					Sfx.play(landSfx);
 				}
 				
 				player.y = Math.floor(player.y);
@@ -805,6 +808,7 @@ function ld42_init() {
 	oneDownSfx = Assets.addSfx("../sfx/1down.wav");
 	jumpSfx = Assets.addSfx("../sfx/jump.wav");
 	landSfx = Assets.addSfx("../sfx/ground.wav");
+	landHardSfx = Assets.addSfx("../sfx/ground-hard.wav");
 	ouchHeadSfx = Assets.addSfx("../sfx/hit-head.wav");
 	ouchWallSfx = Assets.addSfx("../sfx/hit-wall.wav");
 	spikesSfx = Assets.addSfx("../sfx/spikes.wav");
