@@ -26,7 +26,9 @@ const ACHIEV_ONE_UP      =  7;
 const ACHIEV_ONE_DOWN    =  8;
 const ACHIEV_WALKER_DIE  =  9;
 const ACHIEV_WALKER_KILL = 10;
-const ACHIEV_PLAYTIME    = 11;
+const ACHIEV_JUMPER_DIE  = 11;
+const ACHIEV_JUMPER_KILL = 12;
+const ACHIEV_PLAYTIME    = 13;
 
 const AchievementSteps = [1, 5, 10, 25, 50, 75, 100, 200, 300, 400, 500];
 

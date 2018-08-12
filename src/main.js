@@ -465,7 +465,7 @@ function calculateEnemies() {
 				calculateJumperMovement(e);
 			
 			if(player.yVel > 0 && overlap(player, e) && (player.y < e.y)) {
-				Achievements.add(ACHIEV_WALKER_KILL);
+				Achievements.add((e.type == 0) ? ACHIEV_WALKER_KILL : ACHIEV_JUMPER_KILL);
 				Sfx.play((e.type == 0) ? walkerDeathSfx : jumperDeathSfx);
 				e.dead = 0;
 			}
@@ -586,11 +586,13 @@ function checkPlayerDamage() {
 	
 	let count = enemies.length;
 	for(let idx = 0; idx < count; ++idx) {
-		if(enemies[idx].dead !== null) continue;
-		if(!overlap(player, enemies[idx])) continue;
+		let e = enemies[idx];
 		
-		if(player.health <= 1) Sfx.play((enemies[idx].type == 0) ? walkerAttackSfx : jumperAttackSfx);
-		Achievements.add(ACHIEV_WALKER_DIE);
+		if(e.dead !== null) continue;
+		if(!overlap(player, e)) continue;
+		
+		if(player.health <= 1) Sfx.play((e.type == 0) ? walkerAttackSfx : jumperAttackSfx);
+		Achievements.add((e.type == 0) ? ACHIEV_WALKER_DIE : ACHIEV_JUMPER_DIE);
 		return true;
 	}
 	
