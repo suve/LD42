@@ -719,7 +719,7 @@ function spawnActors(map) {
 }
 
 function resetLevel() {
-	map = new Map(test_mapdata);
+	map = new Map(level0_mapdata);
 	spawnActors(map);
 	items = new Items(map);
 }

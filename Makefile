@@ -23,7 +23,10 @@ SOUNDS_BUILD := $(SOUNDS_DEVEL:sfx/%.wav=build/%.wav)
 SOURCES_DEVEL := $(shell ls src/*.js)
 SOURCES_BUILD := $(SOURCES_DEVEL:src/%.js=build/%.js)
 
-all: build/index.html build/style.css build/mapdata.js $(SOURCES_BUILD) $(GRAPHICS_BUILD) $(SOUNDS_BUILD)
+MAPS_DEVEL := $(shell ls map/*.png)
+MAPS_BUILD := $(MAPS_DEVEL:map/%.png=build/map/%.js)
+
+all: build/index.html build/style.css $(SOURCES_BUILD) $(GRAPHICS_BUILD) $(SOUNDS_BUILD) $(MAPS_BUILD)
 
 build/%.html: src/%.html
 	mkdir -p build
@@ -33,8 +36,8 @@ build/%.css: src/%.css
 	mkdir -p build
 	cp "$<" "$@"
 
-build/mapdata.js: map/test.png src/map-to-js.php
-	mkdir -p build
+build/map/%.js: map/%.png src/map-to-js.php
+	mkdir -p build/map
 	src/map-to-js.php "$<" > "$@"
 
 build/%.js: src/%.js
