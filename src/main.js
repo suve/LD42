@@ -99,7 +99,17 @@ function printText(x, y, text, size, colour) {
 	if(size !== null) ctx.font = size+'px monospace';
 	if(colour !== null) ctx.fillStyle = colour;
 	
+	ctx.textAlign = 'start';
 	ctx.textBaseline = 'top';
+	ctx.fillText(text, x, y);
+}
+
+function printTextCentered(x, y, text, size, colour) {
+	if(size !== null) ctx.font = size+'px monospace';
+	if(colour !== null) ctx.fillStyle = colour;
+	
+	ctx.textAlign = 'center';
+	ctx.textBaseline = 'alphabetic';
 	ctx.fillText(text, x, y);
 }
 
@@ -126,20 +136,26 @@ function drawFrame() {
 		
 		fillRect(0, 0, wid, null, 'black');
 		fillRect(canvas.width-wid+1, 0, wid, null, 'black');
+		
+		drawLogo();
 	}
 	
 	let fps = countFPS();
 	printText(0, 0, fps+'FPS', 12, 'white');
 }
 
-function drawLogo() {
+function drawLogo(scale) {
 	const LogoPos = [3, 58, 98, 133];
+	
+	if(scale === undefined) scale = 1.0;
 	
 	let pieces = logoGfx.length;
 	for(let idx = 0; idx < pieces; ++idx) {
 		if(!logoGfx[idx].complete) return;
 		
-		ctx.drawImage(logoGfx[idx], Math.floor((canvas.width - logoGfx[idx].width) / 2), LogoPos[idx]);
+		let w = Math.floor(logoGfx[idx].width * scale);
+		let h = Math.floor(logoGfx[idx].height * scale);
+		ctx.drawImage(logoGfx[idx], Math.floor((canvas.width - w) / 2), Math.floor(LogoPos[idx]*scale), w, h);
 	}
 }
 
@@ -160,6 +176,35 @@ function drawFrame_loading() {
 	
 	drawLogo();
 }
+
+function drawFrame_title() {
+	const AnimationOffset = CYCLES_PER_SECOND*2;
+	const AnimationLength = CYCLES_PER_SECOND;
+	const TargetScale = 0.666;
+	
+	fillRect(0, 0, null ,null, 'black');
+	if(__titleScreenCycles < AnimationOffset) {
+		drawLogo();
+		return;
+	}
+	
+	let progress = (__titleScreenCycles - AnimationOffset) / AnimationLength;
+	if(progress > 1.0) progress = 1.0;
+	
+	drawLogo(1 - progress*(1-TargetScale));
+	
+	printTextCentered(canvas.width / 2, canvas.height * 0.75, 'Use the arrow keys to move', 18*progress, 'white');
+	printTextCentered(canvas.width / 2, canvas.height * 0.88, 'Press space to start!', 18*progress, 'white');
+}
+
+var __titleScreenCycles = 0;
+
+function titleScreenLogic() {
+	__titleScreenCycles += 1;
+	
+	return keystate[32];
+}
+
 
 function keycode(ev) {
 	let k = ev.keyCode;
@@ -399,6 +444,8 @@ function ld42_init() {
 	spikesSfx = Assets.addSfx("../sfx/spikes.wav");
 	
 	let loaded = false;
+	let inGame = false;
+	
 	let oldTicks = getTicks();
 	let main_loop = function() {
 		let ticks = getTicks() - oldTicks;
@@ -406,8 +453,13 @@ function ld42_init() {
 		oldTicks += cycles * CYCLE_TICKS;
 		
 		if(loaded) {
-			while(cycles --> 0) gameLogic();
-			drawFrame();
+			if(inGame) {
+				while(cycles --> 0) gameLogic();
+				drawFrame();
+			} else {
+				while(cycles --> 0) inGame = inGame || titleScreenLogic();
+				drawFrame_title();
+			}
 		} else {
 			drawFrame_loading();
 			loaded = Assets.loadingFinished();
