@@ -144,12 +144,19 @@ function drawLogo() {
 }
 
 function drawFrame_loading() {
+	fillRect(0, 0, null ,null, 'black');
+	
 	let files = Assets.getList();
+	
+	let done = 0;
 	let count = files.length;
 	for(let idx = 0; idx < count; ++idx) {
 		let f = files[idx];
-		printText(32, 16 + 12*idx, f.path, 10, f.ready ? 'lime' : '#7F7F7F');
+		printText(4, 16 + 12*idx, f.path, 10, f.ready ? 'lime' : '#7F7F7F');
+		
+		done += !!f.ready;
 	}
+	printText(4, 4, Math.floor(done * 100 / count) + '%', 10, 'white');
 	
 	drawLogo();
 }
@@ -403,7 +410,7 @@ function ld42_init() {
 			drawFrame();
 		} else {
 			drawFrame_loading();
-			loaded = Assets.isFinished();
+			loaded = Assets.loadingFinished();
 		}
 		
 		window.setTimeout(main_loop, CYCLE_TICKS - (ticks % CYCLE_TICKS));

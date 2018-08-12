@@ -54,7 +54,7 @@ function __assets() {
 		return sfx;
 	};
 	
-	this.isFinished = function() {
+	this.loadingFinished = function() {
 		var count = this.__list.length;
 		for(let idx = 0; idx < count; ++idx) {
 			if(!this.__ready(this.__list[idx])) return false;
