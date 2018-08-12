@@ -56,12 +56,13 @@ var enemies = [];
 
 var logoGfx = [];
 var coinGfx = [], potionGfx = [];
-var playerGfx = [], walkerGfx = [];
+var playerGfx = [], walkerGfx = [], jumperGfx = [];
 var worldGfx = [];
 var achievGfx;
 
 var achievSfx, jumpSfx, landSfx, spikesSfx, ouchHeadSfx, ouchWallSfx;
 var walkerAttackSfx, walkerDeathSfx;
+var jumperAttackSfx, jumperDeathSfx, jumperJumpSfx;
 var coinSfx, oneUpSfx, oneDownSfx;
 
 
@@ -155,10 +156,35 @@ function drawWalker(e) {
 	ctx.drawImage(walkerGfx[scale], frame*scale, face*scale, scale, scale, Math.floor(e.x*scale), Math.floor((e.y-1)*scale), scale, scale);
 }
 
+function drawJumper(e) {
+	let scale = viewport.getScale();
+	
+	let frame, face;
+	if(e.dead === null) {
+		if(e.jumping())
+			frame = 3;
+		else if(e.falling())
+			frame = 4;
+		else
+			frame = e.frame;
+		
+		face = e.facing; 
+	} else {
+		frame = Math.floor(e.dead / ANIM_DEATH_TICKS_PER_FRAME);
+		face = 2; // magic numbers FTW
+	}
+	
+	ctx.drawImage(jumperGfx[scale], frame*scale, face*scale, scale, scale, Math.floor(e.x*scale), Math.floor((e.y-1)*scale), scale, scale);
+}
+
 function drawEnemies() {
 	let count = enemies.length;
 	for(let idx = 0; idx < count; ++idx) {
-		drawWalker(enemies[idx]);
+		let e = enemies[idx];
+		if(e.type == 0)
+			drawWalker(e);
+		else
+			drawJumper(e);
 	}
 }
 
@@ -323,6 +349,40 @@ function calculateWalkerMovement(e) {
 	e.animate(CYCLE_TICKS);
 }
 
+function calculateJumperMovement(e) {
+	if(e.facing == FACING_LEFT) {
+		e.xVel -= WALKER_ACCEL / 4 * CYCLE_SECONDS;
+		if(e.xVel < -WALKER_MAX_SPEED) e.xVel = -WALKER_MAX_SPEED;
+	} else {
+		e.xVel += WALKER_ACCEL / 4 * CYCLE_SECONDS;
+		if(e.xVel > WALKER_MAX_SPEED) e.xVel = WALKER_MAX_SPEED;
+	}
+	
+	let oldX = e.x;
+	e.x += e.xVel * CYCLE_SECONDS;
+	
+	let turnAround = false;
+	if(e.xVel > 0) {
+		turnAround =
+			map.collides(e.x+e.w, e.y-0.05) || map.collides(e.x+e.w, e.y-e.h) || 
+			map.deadly(e.x+e.w, e.y-0.05) || map.deadly(e.x+e.w, e.y-e.h) ||
+			!map.collides(e.x+e.w, e.y);
+	} else {
+		turnAround =
+			map.collides(e.x, e.y-0.05) || map.collides(e.x, e.y-e.h) ||
+			map.deadly(e.x, e.y-0.05) || map.deadly(e.x, e.y-e.h) ||
+			!map.collides(e.x,e.y);
+	}
+	
+	if(turnAround) {
+		e.x = oldX;
+		e.xVel = 0;
+		e.facing = !e.facing;
+	}
+	
+	e.animate(CYCLE_TICKS);
+}
+
 function calculateEnemies() {
 	let count = enemies.length;
 	let idx = 0;
@@ -330,11 +390,14 @@ function calculateEnemies() {
 		let e = enemies[idx];
 		
 		if(e.dead === null) {
-			calculateWalkerMovement(e);
+			if(e.type == 0)
+				calculateWalkerMovement(e);
+			else
+				calculateJumperMovement(e);
 			
 			if(player.yVel > 0 && overlap(player, e)) {
 				Achievements.add(ACHIEV_WALKER_KILL);
-				Sfx.play(walkerDeathSfx);
+				Sfx.play((e.type == 0) ? walkerDeathSfx : jumperDeathSfx);
 				e.dead = 0;
 			}
 		} else {
@@ -457,7 +520,7 @@ function checkPlayerDamage() {
 		if(enemies[idx].dead !== null) continue;
 		if(!overlap(player, enemies[idx])) continue;
 		
-		if(player.health <= 1) Sfx.play(walkerAttackSfx);
+		if(player.health <= 1) Sfx.play((enemies[idx].type == 0) ? walkerAttackSfx : jumperAttackSfx);
 		Achievements.add(ACHIEV_WALKER_DIE);
 		return true;
 	}
@@ -554,9 +617,19 @@ function spawnEnemies(map) {
 			if(map.data[y][x] === TILE_WALKER_R) {
 				e = new Player(x, y+1);
 				e.facing = FACING_RIGHT;
+				e.type = 0;
 			} else if(map.data[y][x] === TILE_WALKER_L) {
 				e = new Player(x, y+1);
 				e.facing = FACING_LEFT;
+				e.type = 0;
+			} else if(map.data[y][x] === TILE_JUMPER_R) {
+				e = new Player(x, y+1);
+				e.facing = FACING_RIGHT;
+				e.type = 1;
+			} else if(map.data[y][x] === TILE_JUMPER_L) {
+				e = new Player(x, y+1);
+				e.facing = FACING_LEFT;
+				e.type = 1;
 			}
 			
 			if(e !== null) {
@@ -599,6 +672,7 @@ function ld42_init() {
 		
 		playerGfx[s] = Assets.addGfx("../gfx/hero-"+s+"px.png");
 		walkerGfx[s] = Assets.addGfx("../gfx/walker-"+s+"px.png");
+		jumperGfx[s] = Assets.addGfx("../gfx/jumper-"+s+"px.png");
 		
 		coinGfx[s] = Assets.addGfx("../gfx/coin-"+s+"px.png");
 		potionGfx[s] = Assets.addGfx("../gfx/potion-"+s+"px.png");
@@ -615,6 +689,9 @@ function ld42_init() {
 	spikesSfx = Assets.addSfx("../sfx/spikes.wav");
 	walkerAttackSfx = Assets.addSfx("../sfx/walker-attack.wav");
 	walkerDeathSfx = Assets.addSfx("../sfx/walker-death.wav");
+	jumperAttackSfx = Assets.addSfx("../sfx/jumper-attack.wav");
+	jumperDeathSfx = Assets.addSfx("../sfx/jumper-death.wav");
+	jumperJumpSfx = Assets.addSfx("../sfx/jumper-jump.wav");
 	
 	let loaded = false;
 	let inGame = false;

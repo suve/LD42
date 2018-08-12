@@ -21,8 +21,10 @@ const TILE_DEADLY = TILE_SPIKES;
 const TILE_COIN = -1;
 const TILE_POTION = -2;
 
-const TILE_WALKER_R = -1000;
-const TILE_WALKER_L = -1001;
+const TILE_WALKER_R = -50;
+const TILE_WALKER_L = -51;
+const TILE_JUMPER_R = -52;
+const TILE_JUMPER_L = -53;
 
 function Map(data) {
 	this.__copyData = function(data) {
