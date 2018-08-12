@@ -194,7 +194,8 @@ function drawFrame_title() {
 	drawLogo(1 - progress*(1-TargetScale));
 	
 	printTextCentered(canvas.width / 2, canvas.height * 0.75, 'Use the arrow keys to move', 18*progress, 'white');
-	printTextCentered(canvas.width / 2, canvas.height * 0.88, 'Press space to start!', 18*progress, 'white');
+	printTextCentered(canvas.width / 2, canvas.height * 0.85, 'Press space to start!', 18*progress, 'white');
+	printTextCentered(canvas.width / 2, canvas.height * 0.96, 'a Ludum Dare 42 entry by suve', 12*progress, '#7f7f7f');
 }
 
 var __titleScreenCycles = 0;
