@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program (LICENCE.txt). 
+ * along with this program (LICENCE-AGPL-v3.txt).
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -255,12 +255,15 @@ function drawFrame_loading() {
 	let done = 0;
 	let count = files.length;
 	for(let idx = 0; idx < count; ++idx) {
+		let row = Math.floor(idx / 2);
+		let column = idx % 2;
+		
 		let f = files[idx];
-		printText(4, 16 + 12*idx, f.path, 10, f.ready ? 'lime' : '#7F7F7F');
+		printText(4 + (canvas.width/2)*column, 14 + 11*row, f.path, 9, f.ready ? 'lime' : '#7F7F7F');
 		
 		done += !!f.ready;
 	}
-	printText(4, 4, Math.floor(done * 100 / count) + '%', 10, 'white');
+	printText(4, 4, Math.floor(done * 100 / count) + '%', 8, 'white');
 	
 	drawLogo();
 }
@@ -791,7 +794,6 @@ function ld42_init() {
 	
 	achievGfx = Assets.addGfx("../gfx/achievements.png");
 	
-	const GfxSizes = [8, 12];
 	for(let idx = 0; idx < GfxSizes.length; ++idx) {
 		let s = GfxSizes[idx];
 		worldGfx[s] = Assets.addGfx("../gfx/world-"+s+"px.png");
