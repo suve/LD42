@@ -640,35 +640,8 @@ function checkPlayerDamage() {
 	return false;
 }
 
-var __playtimeTicks = 0;
-var __playtimeLevel = 0;
-
-function playtimeAchievementCheck() {
-	const PlaytimeThresholds = [
-		TICKS_PER_SECOND * 30,
-		TICKS_PER_SECOND * 60,
-		TICKS_PER_SECOND * 60 * 3,
-		TICKS_PER_SECOND * 60 * 5,
-		TICKS_PER_SECOND * 60 * 10,
-		TICKS_PER_SECOND * 60 * 15,
-		TICKS_PER_SECOND * 60 * 20,
-		TICKS_PER_SECOND * 60 * 25,
-		TICKS_PER_SECOND * 60 * 30,
-		TICKS_PER_SECOND * 60 * 35,
-		TICKS_PER_SECOND * 60 * 40,
-	];
-	
-	if(__playtimeLevel >= PlaytimeThresholds.length) return;
-	
-	__playtimeTicks += CYCLE_TICKS;
-	if(__playtimeTicks < PlaytimeThresholds[__playtimeLevel]) return;
-	
-	Achievements.add(ACHIEV_PLAYTIME, true);
-	__playtimeLevel += 1;
-}
-
 function gameLogic() {
-	playtimeAchievementCheck();
+	Achievements.checkPlaytime(CYCLE_TICKS);
 	
 	if(player.dead !== null) {
 		player.dead += CYCLE_SECONDS;

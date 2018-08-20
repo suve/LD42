@@ -33,35 +33,68 @@ const ACHIEV_PLAYTIME    = 14;
 
 const AchievementSteps = [1, 5, 10, 25, 50, 75, 100, 200, 300, 400, 500];
 
+const PlaytimeThresholds = [
+	1000 * 30,
+	1000 * 60,
+	1000 * 60 * 3,
+	1000 * 60 * 5,
+	1000 * 60 * 10,
+	1000 * 60 * 15,
+	1000 * 60 * 20,
+	1000 * 60 * 25,
+	1000 * 60 * 30,
+	1000 * 60 * 35,
+	1000 * 60 * 40,
+];
+
+
 function __achievements() {
 	this.reset = function() {
 		this.list = [];
 		this.stack = [];
+		
+		this.playtimeTicks = 0;
+		this.playtimeLevel = 0;
 	};
 	
 	this.add = function(achiev, bumpToNextRank) {
-		let steps = AchievementSteps.length;
-		
 		if(!this.list[achiev]) this.list[achiev] = 0;
+		
+		let totalSteps = AchievementSteps.length;
+		let step = -1;
+		
 		if(bumpToNextRank) {
-			for(let idx = 0; idx < steps; ++idx) {
+			for(let idx = 0; idx < totalSteps; ++idx) {
 				if(this.list[achiev] < AchievementSteps[idx]) {
 					this.list[achiev] = AchievementSteps[idx];
+					step = idx;
 					break;
 				}
 			}
 		} else {
 			this.list[achiev] += 1;
-		}
-		
-		for(let idx = 0; idx < steps; ++idx) {
-			if(this.list[achiev] == AchievementSteps[idx]) {
-				this.stack.push({'type': achiev, 'step': idx});
-				Sfx.play(achievSfx);
-				
-				return;
+			for(let idx = 0; idx < totalSteps; ++idx) {
+				if(this.list[achiev] == AchievementSteps[idx]) {
+					step = idx;
+					break;
+				}
 			}
 		}
+		
+		if(step >= 0) { 
+			this.stack.push({'type': achiev, 'step': step});
+			Sfx.play(achievSfx);
+		}
+	};
+	
+	this.checkPlaytime = function(change) {
+		if(this.playtimeLevel >= PlaytimeThresholds.length) return;
+
+		this.playtimeTicks += change;
+		if(this.playtimeTicks < PlaytimeThresholds[this.playtimeLevel]) return;
+
+		this.add(ACHIEV_PLAYTIME, true);
+		this.playtimeLevel += 1;
 	};
 	
 	this.render = function() {
