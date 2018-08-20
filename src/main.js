@@ -640,6 +640,7 @@ function checkPlayerDamage() {
 	return false;
 }
 
+var __playtimeTicks = 0;
 var __playtimeLevel = 0;
 
 function playtimeAchievementCheck() {
@@ -659,8 +660,8 @@ function playtimeAchievementCheck() {
 	
 	if(__playtimeLevel >= PlaytimeThresholds.length) return;
 	
-	let ticks = getTicks();
-	if(ticks < PlaytimeThresholds[__playtimeLevel]) return;
+	__playtimeTicks += CYCLE_TICKS;
+	if(__playtimeTicks < PlaytimeThresholds[__playtimeLevel]) return;
 	
 	Achievements.add(ACHIEV_PLAYTIME, true);
 	__playtimeLevel += 1;
