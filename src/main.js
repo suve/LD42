@@ -58,7 +58,7 @@ const ARROW_DOWN = 40;
 
 // Global vars, fuck yeah
 var appstart;
-var canvas, ctx, ctxOrg, viewport;
+var canvas, ctx, fadeout, viewport;
 
 var keystate = [];
 var items, map;
@@ -220,10 +220,7 @@ function drawFrame() {
 	
 	if(player.dead !== null) {
 		let perc = player.dead / DEATH_ANIM_TIME;
-		let wid = canvas.width / 2 * perc;
-		
-		fillRect(0, 0, wid, null, 'black');
-		fillRect(canvas.width-wid+1, 0, wid, null, 'black');
+		fadeout.draw(perc);
 		
 		drawLogo();
 	}
@@ -657,6 +654,7 @@ function gameLogic() {
 		if(checkPlayerDamage()) {
 			if(player.health <= 1) {
 				player.dead = 0;
+				fadeout = new Fadeout();
 				return;
 			} 
 			
