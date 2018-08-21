@@ -125,6 +125,15 @@ function fillCircle(x,y,r,col) {
 	ctx.fill();
 }
 
+function fillAnnulus(x, y, r_out, r_in, col) {
+	if(col !== null) ctx.fillStyle = col;
+	
+	ctx.beginPath();
+	if(r_in > 0) ctx.arc(x, y, r_in, 0, Math.PI*2, true);
+	ctx.arc(x, y, r_out, 0, Math.PI*2);
+	ctx.fill();
+}
+
 function fillTriangle(x1, y1, x2, y2, x3, y3, col) {
 	if(col !== null) ctx.fillStyle = col;
 	

@@ -19,7 +19,8 @@ const FADEOUT_VERTICAL = 0;
 const FADEOUT_HORIZONTAL = 1;
 const FADEOUT_TRIANGLE_SLASH = 2;
 const FADEOUT_TRIANGLE_BACKSLASH = 3;
-const __FADEOUT_MAX = 3;
+const FADEOUT_CIRCLE = 4;
+const __FADEOUT_MAX = 4;
 
 function Fadeout(type) {
 	let draw_vertical = function(progress) {
@@ -42,7 +43,7 @@ function Fadeout(type) {
 		
 		fillTriangle(0, 0, wid, 0, 0, hei, 'black');
 		fillTriangle(canvas.width, canvas.height, canvas.width - wid, canvas.height, canvas.width, canvas.height - hei, 'black');
-	}
+	};
 	
 	let draw_triangle_backslash = function(progress) {
 		let wid = canvas.width * progress;
@@ -50,7 +51,12 @@ function Fadeout(type) {
 		
 		fillTriangle(0, canvas.height, wid, canvas.height, 0, canvas.height - hei, 'black');
 		fillTriangle(canvas.width, 0, canvas.width - wid, 0, canvas.width, hei, 'black');
-	}
+	};
+	
+	let draw_circle = function(progress) {
+		let inner_rad = Math.floor((1.0 - progress) * canvas.width / 2);
+		fillAnnulus(canvas.width / 2, canvas.height / 2, canvas.width, inner_rad, 'black');
+	};
 	
 	if(type === undefined) type = Math.floor(Math.random() * (__FADEOUT_MAX+1));
 	
@@ -69,6 +75,10 @@ function Fadeout(type) {
 		
 		case FADEOUT_TRIANGLE_BACKSLASH:
 			this.draw = draw_triangle_backslash;
+		break;
+		
+		case FADEOUT_CIRCLE:
+			this.draw = draw_circle;
 		break;
 		
 		default:
