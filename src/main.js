@@ -58,7 +58,7 @@ const ARROW_DOWN = 40;
 
 // Global vars, fuck yeah
 var appstart;
-var canvas, ctx, fadeout, viewport;
+var canvas, ctx, fadeout, shaking, viewport;
 
 var keystate = [];
 var items, map;
@@ -226,6 +226,8 @@ function drawEnemies() {
 function drawFrame() {
 	let scale = viewport.getScale();
 	viewport.update(player);
+	if(shaking) { viewport.x += shaking.magnitude.x; viewport.y += shaking.magnitude.y; }
+	
 	ctx.restore(); ctx.save();
 	ctx.translate(-Math.floor(viewport.x * scale), -Math.floor(viewport.y * scale));
 	
@@ -235,6 +237,7 @@ function drawFrame() {
 	drawPlayer();
 	
 	ctx.restore(); ctx.save();
+	if(shaking) shaking.draw();
 	Achievements.render();
 	
 	if(player.dead !== null) {
@@ -563,7 +566,9 @@ function calculatePlayerMovement() {
 		} else {
 			if(map.collides(player.x, player.y) || map.collides(player.x + player.w, player.y)) {
 				if(player.yVel >= LAND_HARD_THRESHOLD) {
+					shaking = new Screenshake(player.yVel / LAND_HARD_THRESHOLD * 1.666, 0.666);
 					Sfx.play(landHardSfx);
+					
 					Achievements.add(ACHIEV_LAND);
 				} else if(player.yVel > LAND_SFX_THRESHOLD) {
 					Sfx.play(landSfx);
@@ -682,6 +687,8 @@ function gameLogic() {
 	} else {
 		player.invul--;
 	}
+	
+	if(shaking) shaking.update(CYCLE_SECONDS);
 	
 	items.decay(CYCLE_TICKS);
 	items.collect(player.x, player.y-0.05);
