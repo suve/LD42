@@ -125,6 +125,16 @@ function fillCircle(x,y,r,col) {
 	ctx.fill();
 }
 
+function fillTriangle(x1, y1, x2, y2, x3, y3, col) {
+	if(col !== null) ctx.fillStyle = col;
+	
+	ctx.beginPath();
+	ctx.moveTo(x1, y1);
+	ctx.lineTo(x2, y2);
+	ctx.lineTo(x3, y3);
+	ctx.fill();
+}
+
 function printText(x, y, text, size, colour) {
 	if(size !== null) ctx.font = size+'px monospace';
 	if(colour !== null) ctx.fillStyle = colour;

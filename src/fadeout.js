@@ -17,7 +17,9 @@
  */
 const FADEOUT_VERTICAL = 0;
 const FADEOUT_HORIZONTAL = 1;
-const __FADEOUT_MAX = 1;
+const FADEOUT_TRIANGLE_SLASH = 2;
+const FADEOUT_TRIANGLE_BACKSLASH = 3;
+const __FADEOUT_MAX = 3;
 
 function Fadeout(type) {
 	let draw_vertical = function(progress) {
@@ -34,6 +36,22 @@ function Fadeout(type) {
 		fillRect(0, canvas.height-hei+1, null, hei, 'black');
 	};
 	
+	let draw_triangle_slash = function(progress) {
+		let wid = canvas.width * progress;
+		let hei = canvas.height * progress;
+		
+		fillTriangle(0, 0, wid, 0, 0, hei, 'black');
+		fillTriangle(canvas.width, canvas.height, canvas.width - wid, canvas.height, canvas.width, canvas.height - hei, 'black');
+	}
+	
+	let draw_triangle_backslash = function(progress) {
+		let wid = canvas.width * progress;
+		let hei = canvas.height * progress;
+		
+		fillTriangle(0, canvas.height, wid, canvas.height, 0, canvas.height - hei, 'black');
+		fillTriangle(canvas.width, 0, canvas.width - wid, 0, canvas.width, hei, 'black');
+	}
+	
 	if(type === undefined) type = Math.floor(Math.random() * (__FADEOUT_MAX+1));
 	
 	switch(type) {
@@ -43,6 +61,14 @@ function Fadeout(type) {
 		
 		case FADEOUT_HORIZONTAL:
 			this.draw = draw_horizontal;
+		break;
+		
+		case FADEOUT_TRIANGLE_SLASH:
+			this.draw = draw_triangle_slash;
+		break;
+		
+		case FADEOUT_TRIANGLE_BACKSLASH:
+			this.draw = draw_triangle_backslash;
 		break;
 		
 		default:
