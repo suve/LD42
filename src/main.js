@@ -856,6 +856,7 @@ function ld42_init() {
 		} else {
 			drawFrame_loading();
 			loaded = Assets.loadingFinished();
+			if(loaded) document.body.style.cursor = 'none';
 		}
 		
 		window.setTimeout(main_loop, CYCLE_TICKS - (ticks % CYCLE_TICKS));
