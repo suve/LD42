@@ -76,7 +76,8 @@ var playerGfx = [], walkerGfx = [], jumperGfx = [];
 var worldGfx = [];
 var achievGfx;
 
-var achievSfx, jumpSfx, landSfx, landHardSfx, spikesSfx, ouchHeadSfx, ouchWallSfx;
+var achievSfx, levelFinishedSfx;
+var jumpSfx, landSfx, landHardSfx, spikesSfx, ouchHeadSfx, ouchWallSfx;
 var walkerAttackSfx, walkerDeathSfx;
 var jumperAttackSfx, jumperDeathSfx, jumperJumpSfx;
 var coinSfx, oneUpSfx, oneDownSfx;
@@ -713,6 +714,7 @@ function gameLogic() {
 		if(tile == TILE_EXIT) {
 			levelNo += 1;
 			inGame = false;
+			Sfx.play(levelFinishedSfx);
 		}
 	}
 }
@@ -817,6 +819,7 @@ function ld42_init() {
 	}
 	
 	achievSfx = Assets.addSfx("../sfx/achiev.wav");
+	levelFinishedSfx = Assets.addSfx("../sfx/level-finished.wav");
 	coinSfx = Assets.addSfx("../sfx/coin.wav");
 	oneUpSfx = Assets.addSfx("../sfx/1up.wav");
 	oneDownSfx = Assets.addSfx("../sfx/1down.wav");
