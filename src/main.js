@@ -170,10 +170,22 @@ function drawPlayer() {
 	
 	let scale = viewport.getScale();
 	
-	let frame = player.frame;
-	if(player.jumping()) frame = 3;
-	if(player.falling()) frame = 4;
-	ctx.drawImage(playerGfx[scale], frame*scale, player.facing*scale, scale, scale, Math.floor(player.x*scale), Math.floor((player.y-1)*scale), scale, scale);
+	let frame, face;
+	if(player.dead === null) {
+		if(player.jumping())
+			frame = 3;
+		else if(player.falling())
+			frame = 4;
+		else
+			frame = player.frame;
+		
+		face = player.facing; 
+	} else {
+		frame = Math.floor(player.dead * TICKS_PER_SECOND / ANIM_DEATH_TICKS_PER_FRAME);
+		face = 2; // magic numbers FTW
+	}
+	
+	ctx.drawImage(playerGfx[scale], frame*scale, face*scale, scale, scale, Math.floor(player.x*scale), Math.floor((player.y-1)*scale), scale, scale);
 }
 
 function drawWalker(e) {
