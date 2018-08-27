@@ -19,7 +19,7 @@
  */
 const TILE_EMPTY = 0;
 const TILE_GRASS = 1;
-const TILE_STONES = 2;
+const TILE_ROCKS = 2;
 const TILE_WALL = 3;
 const TILE_SPIKES = 4;
 
@@ -86,6 +86,9 @@ function hex_to_tile($hex) {
 		
 		case '00C000':
 			return TILE_GRASS;
+		
+		case '7B2910':
+			return TILE_ROCKS;
 		
 		case '7F7F7F':
 			return TILE_WALL;
