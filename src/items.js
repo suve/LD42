@@ -59,14 +59,16 @@ function Items(map) {
 		
 		if(this.__map.data[y][x] >= 0) return;
 		if(this.__map.data[y][x] <= TILE_PLAYER) return;
-		this.__map.data[y][x] = 0;
 		
 		let count = this.__list.length;
 		for(let idx = 0; idx < count; ++idx) {
 			let e = this.__list[idx];
 			
 			if((e.x === x) && (e.y === y)) {
-				if(this.apply(e.type)) e.dead = 0;
+				if(this.apply(e.type)) {
+					this.__map.data[y][x] = 0;
+					e.dead = 0;
+				}
 				return;
 			}
 		}
