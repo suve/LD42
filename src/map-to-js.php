@@ -19,8 +19,9 @@
  */
 const TILE_EMPTY = 0;
 const TILE_GRASS = 1;
-const TILE_WALL = 2;
-const TILE_SPIKES = 3;
+const TILE_STONES = 2;
+const TILE_WALL = 3;
+const TILE_SPIKES = 4;
 
 const TILE_COIN = -1;
 const TILE_POTION = -2;

@@ -15,7 +15,7 @@
  * along with this program (LICENCE-AGPL-v3.txt).
  * If not, see <http://www.gnu.org/licenses/>.
  */
-const TILE_SPIKES = 3;
+const TILE_SPIKES = 4;
 const TILE_DEADLY = TILE_SPIKES;
 
 const TILE_COIN = -1;
