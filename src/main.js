@@ -714,6 +714,7 @@ function gameLogic() {
 		if(tile == TILE_EXIT) {
 			levelNo += 1;
 			inGame = false;
+			intermissionCycles = 0;
 			Sfx.play(levelFinishedSfx);
 		}
 	}
