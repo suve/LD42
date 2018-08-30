@@ -790,6 +790,9 @@ function resetLevel() {
 	map = new Map(_mapdata);
 	spawnActors(map);
 	items = new Items(map);
+	
+	shaking = null;
+	fadeout = null;
 }
 
 function ld42_init() {
