@@ -81,6 +81,7 @@ var jumpSfx, landSfx, landHardSfx, spikesSfx, ouchHeadSfx, ouchWallSfx;
 var walkerAttackSfx, walkerDeathSfx;
 var jumperAttackSfx, jumperDeathSfx, jumperJumpSfx;
 var coinSfx, oneUpSfx, oneDownSfx;
+var numfont, numfontGfx;
 
 
 function getTicks() {
@@ -809,6 +810,10 @@ function ld42_init() {
 	logoGfx[3] = Assets.addGfx("../gfx/logo-deluxe.png");
 	
 	achievGfx = Assets.addGfx("../gfx/achievements.png");
+	numfontGfx = Assets.addGfx("../gfx/numfont.png");
+	
+	numfont = new BitmapFont(numfontGfx, '0', 5, 7);
+	numfont.setSpacing(1, 1);
 	
 	for(let idx = 0; idx < GfxSizes.length; ++idx) {
 		let s = GfxSizes[idx];
