@@ -271,13 +271,6 @@ function drawFrame() {
 	if(shaking) shaking.draw();
 	Achievements.render();
 	
-	if(player.dead !== null) {
-		let perc = player.dead / DEATH_ANIM_TIME;
-		fadeout.draw(perc);
-		
-		drawLogo();
-	}
-	
 	let fps = countFPS();
 	numfont.print(fps, canvas.width-numfont.textWidth(fps)-1, 1);
 	
@@ -286,6 +279,13 @@ function drawFrame() {
 	
 	let coins = Achievements.getCoinCount();
 	numfont.print(coins, Math.floor((canvas.width - numfont.textWidth(coins)) / 2), 1);
+	
+	if(player.dead !== null) {
+		let perc = player.dead / DEATH_ANIM_TIME;
+		fadeout.draw(perc);
+		
+		drawLogo();
+	}
 }
 
 function drawLogo(scale) {
