@@ -97,6 +97,11 @@ function __achievements() {
 		this.playtimeLevel += 1;
 	};
 	
+	this.getCoinCount = function() {
+		let count = this.list[ACHIEV_COIN];
+		return count ? count : 0;
+	};
+	
 	this.render = function() {
 		const AchievSize = 24;
 		const HalfSize = AchievSize / 2;

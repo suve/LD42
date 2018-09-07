@@ -30,10 +30,10 @@ function BitmapFont(img, start, w, h) {
 	};
 	
 	this.textWidth = function(text) {
-		let len = text.length;
+		let len = text.toString().length;
 		let wid = (len * w) + ((len > 0) ? (len-1) : 0) * this.xspc;
 		
-		return wid * scale;
+		return wid * this.scale;
 	};
 	
 	this.print = function(text, x, y) {

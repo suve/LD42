@@ -237,6 +237,23 @@ function drawEnemies() {
 	}
 }
 
+function secondsToTime(secs) {
+	secs = Math.floor(secs);
+	if(secs < 60) return '0:' + secs.toString().padStart(2, '0');
+	
+	
+	let mins = Math.floor(secs / 60);
+	secs %= 60;
+	
+	if(mins < 60) return mins + ':' + secs.toString().padStart(2, '0');
+	
+	
+	let hrs = Math.floor(mins / 60);
+	mins %= 60;
+	
+	return hrs + ':' + mins.toString().padStart(2, '0') + ':' + secs.toString().padStart(2, '0');
+}
+
 function drawFrame() {
 	let scale = viewport.getScale();
 	viewport.update(player);
@@ -262,7 +279,13 @@ function drawFrame() {
 	}
 	
 	let fps = countFPS();
-	printText(0, 0, fps+'FPS', 12, 'white');
+	numfont.print(fps, canvas.width-numfont.textWidth(fps)-1, 1);
+	
+	let secs = Achievements.playtimeTicks / TICKS_PER_SECOND;
+	numfont.print(secondsToTime(secs), 1, 1);
+	
+	let coins = Achievements.getCoinCount();
+	numfont.print(coins, Math.floor((canvas.width - numfont.textWidth(coins)) / 2), 1);
 }
 
 function drawLogo(scale) {
