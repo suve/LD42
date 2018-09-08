@@ -305,23 +305,20 @@ function drawLogo(scale) {
 
 function drawFrame_loading() {
 	fillRect(0, 0, null ,null, 'black');
+	drawLogo(.75);
 	
 	let files = Assets.getList();
+	let count = files.length;
 	
 	let done = 0;
-	let count = files.length;
-	for(let idx = 0; idx < count; ++idx) {
-		let row = Math.floor(idx / 2);
-		let column = idx % 2;
-		
-		let f = files[idx];
-		printText(4 + (canvas.width/2)*column, 14 + 11*row, f.path, 9, f.ready ? 'lime' : '#7F7F7F');
-		
-		done += !!f.ready;
-	}
-	printText(4, 4, Math.floor(done * 100 / count) + '%', 8, 'white');
+	for(let idx = 0; idx < count; ++idx) done += !!(files[idx].ready);
 	
-	drawLogo();
+	let percentage = Math.floor(done * 100 / count) + '%';
+	let bar_wid = canvas.width * done / count;
+	
+	fillRect(0, canvas.height * 0.8, null, canvas.height / 10, '#454545');
+	fillRect((canvas.width - bar_wid) / 2, canvas.height * 0.8, bar_wid, canvas.height / 10, '#007F00');
+	printTextCentered(canvas.width / 2, canvas.height * 0.875, percentage, canvas.height / 15, 'white');
 }
 
 function drawIntermissionFrame() {
