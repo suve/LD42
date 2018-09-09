@@ -303,9 +303,11 @@ function drawLogo(scale) {
 	}
 }
 
+const LoadingLogoScale = 0.85;
+
 function drawFrame_loading() {
 	fillRect(0, 0, null ,null, 'black');
-	drawLogo(.75);
+	drawLogo(LoadingLogoScale);
 	
 	let files = Assets.getList();
 	let count = files.length;
@@ -322,19 +324,22 @@ function drawFrame_loading() {
 	let percentage = Math.floor(done * 100 / count) + '%';
 	let bar_wid = canvas.width * done / count;
 	
-	fillRect(0, canvas.height * 0.8, null, canvas.height / 10, '#454545');
-	fillRect((canvas.width - bar_wid) / 2, canvas.height * 0.8, bar_wid, canvas.height / 10, error ? '#7F0000' : '#007F00');
-	printTextCentered(canvas.width / 2, canvas.height * 0.875, percentage, canvas.height / 15, 'white');
+	fillRect(0, canvas.height * 0.85, null, canvas.height / 10, '#454545');
+	fillRect((canvas.width - bar_wid) / 2, canvas.height * 0.85, bar_wid, canvas.height / 10, error ? '#7F0000' : '#007F00');
+	printTextCentered(canvas.width / 2, canvas.height * 0.925, percentage, canvas.height / 15, 'white');
 }
 
 function drawIntermissionFrame() {
 	const TargetScale = 0.666;
 	
+	let StartingScale;
 	let AnimationOffset, AnimationLength;
 	if(levelNo == 0) {
-		AnimationOffset = CYCLES_PER_SECOND*2;
+		StartingScale = LoadingLogoScale;
+		AnimationOffset = CYCLES_PER_SECOND / 2;
 		AnimationLength = CYCLES_PER_SECOND;
 	} else {
+		StartingScale = 1.0;
 		AnimationOffset = CYCLES_PER_SECOND/4;
 		AnimationLength = CYCLES_PER_SECOND*3/4;
 	}
@@ -342,14 +347,14 @@ function drawIntermissionFrame() {
 	
 	fillRect(0, 0, null ,null, 'black');
 	if(intermissionCycles < AnimationOffset) {
-		drawLogo();
+		drawLogo(StartingScale);
 		return;
 	}
 	
 	let progress = (intermissionCycles - AnimationOffset) / AnimationLength;
 	if(progress > 1.0) progress = 1.0;
 	
-	drawLogo(1 - progress*(1-TargetScale));
+	drawLogo(StartingScale - progress*(StartingScale-TargetScale));
 	
 	
 	let top_text, bottom_text;
