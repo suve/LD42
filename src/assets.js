@@ -15,68 +15,58 @@
  * along with this program (LICENCE-AGPL-v3.txt).
  * If not, see <http://www.gnu.org/licenses/>.
  */
+const ASSET_ERROR   = -1;
+const ASSET_LOADING =  0;
+const ASSET_READY   = +1;
+
 function __assets() {
 	this.__list = [];
 	
-	this.__ready = function(item) {
-		if(item.elem instanceof HTMLMediaElement)
-			return (item.elem.readyState == HTMLMediaElement.HAVE_ENOUGH_DATA);
-		
-		return item.elem.complete;
+	this.__addEntry = function(path, elem) {
+		let entry = {
+			'ready': ASSET_LOADING,
+			'path': path,
+			'elem': elem
+		};
+		elem.onload = () => entry.ready = ASSET_READY;
+		elem.oncanplaythrough = () => entry.ready = ASSET_READY;
+		elem.onerror = () => entry.ready = ASSET_ERROR;
+
+		document.body.appendChild(elem);
+		this.__list.push(entry);
 	};
 	
 	this.addGfx = function(path) {
-		var img = new Image();
+		let img = new Image();
 		img.src = path;
 		img.alt = path;
 
-		document.body.appendChild(img);
-		this.__list.push({
-			'path': path,
-			'elem': img
-		});
-		
+		this.__addEntry(path, img);
 		return img;
 	};
 	
 	this.addSfx = function(path) {
-		var sfx = new Audio(path);
+		let sfx = new Audio(path);
 		sfx.preload = true;
 		sfx.autoplay = false;
 		sfx.type = 'audio/wav';
 
-		document.body.appendChild(sfx);
-		this.__list.push({
-			'path': path,
-			'elem': sfx
-		});
-		
+		this.__addEntry(path, sfx);
 		return sfx;
 	};
 	
 	this.loadingFinished = function() {
 		var count = this.__list.length;
 		for(let idx = 0; idx < count; ++idx) {
-			if(!this.__ready(this.__list[idx])) return false;
+			let e = this.__list[idx];
+			if(e.ready !== ASSET_READY) return false;
 		}
 		
 		return true;
 	};
 	
 	this.getList = function() {
-		var result = [];
-		
-		var count = this.__list.length;
-		for(let idx = 0; idx < count; ++idx) {
-			let it = this.__list[idx];
-			
-			result.push({
-				'path': it.path,
-				'ready': this.__ready(it)
-			});
-		}
-		
-		return result;
+		return this.__list;
 	};
 }
 

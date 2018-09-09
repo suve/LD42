@@ -311,13 +311,19 @@ function drawFrame_loading() {
 	let count = files.length;
 	
 	let done = 0;
-	for(let idx = 0; idx < count; ++idx) done += !!(files[idx].ready);
+	let error = 0;
+	for(let idx = 0; idx < count; ++idx) {
+		if(files[idx].ready === ASSET_READY)
+			++done;
+		else if(files[idx].ready === ASSET_ERROR)
+			++error;
+	}
 	
 	let percentage = Math.floor(done * 100 / count) + '%';
 	let bar_wid = canvas.width * done / count;
 	
 	fillRect(0, canvas.height * 0.8, null, canvas.height / 10, '#454545');
-	fillRect((canvas.width - bar_wid) / 2, canvas.height * 0.8, bar_wid, canvas.height / 10, '#007F00');
+	fillRect((canvas.width - bar_wid) / 2, canvas.height * 0.8, bar_wid, canvas.height / 10, error ? '#7F0000' : '#007F00');
 	printTextCentered(canvas.width / 2, canvas.height * 0.875, percentage, canvas.height / 15, 'white');
 }
 
