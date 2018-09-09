@@ -55,6 +55,15 @@ function __assets() {
 		return sfx;
 	};
 	
+	this.addScript = function(path) {
+		let js = document.createElement("script");
+		js.type = 'application/javascript';
+		js.src = path;
+		
+		this.__addEntry(path, js);
+		return js;
+	};
+	
 	this.loadingFinished = function() {
 		var count = this.__list.length;
 		for(let idx = 0; idx < count; ++idx) {

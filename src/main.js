@@ -875,6 +875,11 @@ function ld42_init() {
 	jumperDeathSfx = Assets.addSfx("../sfx/jumper-death.wav");
 	jumperJumpSfx = Assets.addSfx("../sfx/jumper-jump.wav");
 	
+	Assets.addScript('map/level0.js');
+	Assets.addScript('map/level1.js');
+	Assets.addScript('map/level2.js');
+	Assets.addScript('map/level3.js');
+	
 	let loaded = false;
 	levelNo = 0;
 	inGame = false;
