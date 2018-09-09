@@ -152,7 +152,7 @@ function printText(x, y, text, size, colour) {
 	
 	ctx.textAlign = 'start';
 	ctx.textBaseline = 'top';
-	ctx.fillText(text, x, y);
+	ctx.fillText(text.toString(), x, y);
 }
 
 function printTextCentered(x, y, text, size, colour) {
@@ -161,7 +161,7 @@ function printTextCentered(x, y, text, size, colour) {
 	
 	ctx.textAlign = 'center';
 	ctx.textBaseline = 'alphabetic';
-	ctx.fillText(text, x, y);
+	ctx.fillText(text.toString(), x, y);
 }
 
 function drawPlayer() {
@@ -313,20 +313,26 @@ function drawFrame_loading() {
 	let count = files.length;
 	
 	let done = 0;
-	let error = null;
+	let errors = [];
 	for(let idx = 0; idx < count; ++idx) {
 		if(files[idx].ready === ASSET_READY)
 			++done;
 		else if(files[idx].ready === ASSET_ERROR)
-			error = files[idx].path;
+			errors.push(files[idx].path);
 	}
 	
-	let percentage = Math.floor(done * 100 / count) + '%';
+	let text;
+	if(errors.length) {
+		let seconds = Math.floor(getTicks() / TICKS_PER_SECOND);
+		text = 'Failed to load file: ' + errors[seconds % errors.length];
+	} else {
+		text =  Math.floor(done * 100 / count) + '%';
+	}
 	let bar_wid = canvas.width * done / count;
 	
 	fillRect(0, canvas.height * 0.85, null, canvas.height / 10, '#454545');
-	fillRect((canvas.width - bar_wid) / 2, canvas.height * 0.85, bar_wid, canvas.height / 10, error ? '#7F0000' : '#007F00');
-	printTextCentered(canvas.width / 2, canvas.height * 0.925, error ? ('Failed to load file: ' + error) : percentage, canvas.height / 15, 'white');
+	fillRect((canvas.width - bar_wid) / 2, canvas.height * 0.85, bar_wid, canvas.height / 10, errors.length ? '#7F0000' : '#007F00');
+	printTextCentered(canvas.width / 2, canvas.height * 0.925, text, canvas.height / 15, 'white');
 }
 
 function drawIntermissionFrame() {
